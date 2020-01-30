@@ -17,6 +17,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 
 	"github.com/atoyr/SQLServerGo/database"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/labstack/echo"
 	"github.com/urfave/cli/v2"
 )
@@ -27,19 +28,6 @@ var user string
 var password string
 var db string
 var port string
-
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
-	}
-	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	http.ServeFile(w, r, "./public/index.html")
-}
 
 func main() {
 	app := new(cli.App)
@@ -104,13 +92,62 @@ func main() {
 	}
 }
 
+// func serve(urlPrefix string, fs *packr.Box) echo.MiddlewareFunc {
+// 	fileserver := http.FileServer(fs)
+// 	if urlPrefix != "" {
+// 		fileserver = http.StripPrefix(urlPrefix, fileserver)
+// 	}
+// 	fmt.Println(fileserver)
+// 	return func(before echo.HandlerFunc) echo.HandlerFunc {
+// 		return func(c echo.Context) error {
+// 			err := before(c)
+// 			if err != nil {
+// 				if c, ok := err.(*echo.HTTPError); !ok || c.Code != http.StatusNotFound {
+// 					return err
+// 				}
+// 			}
+//
+// 			w, r := c.Response(), c.Request()
+// 			fmt.Println(urlPrefix)
+// 			fmt.Println(r.URL.Path)
+// 			p := strings.TrimPrefix(r.URL.Path, urlPrefix)
+// 			s, err := fs.FindString(p)
+// 			if err != nil {
+// 				fmt.Println("fuga")
+// 				fmt.Println(err)
+// 			} else {
+// 				fmt.Println("hoge")
+// 				fmt.Println(s)
+// 			}
+// 			if fs.Has(p) {
+// 				fileserver.ServeHTTP(w, r)
+// 				return nil
+// 			}
+// 			return err
+// 		}
+// 	}
+// }
+
+// 	if p := strings.TrimPrefix(filepath, prefix); len(p) < len(filepath) {
+// 		if _, err := b.Open(p); err != nil {
+// 			return false
+// 		}
+// 		return true
+// 	}
+// 	return false
+
 func action(c *cli.Context) error {
 	hub := newHub()
 	go hub.run()
 	back := context.Background()
-	go getFileIO(hub, back)
+	go getFileIO(back, hub)
 	ec := echo.New()
-	ec.Static("/", "./public/index.html")
+
+	box := packr.New("webapps", "./public")
+
+	// ec.GET("/", echo.WrapHandler(http.FileServer(box)))
+	// ec.GET("/*", echo.WrapHandler(http.FileServer(box)))
+	ec.GET("/*", echo.WrapHandler(http.StripPrefix("/", http.FileServer(box))))
 	ec.GET("/ws", func(c echo.Context) error {
 		serveWs(hub, c.Response(), c.Request())
 		return nil
@@ -122,7 +159,7 @@ func action(c *cli.Context) error {
 	return nil
 }
 
-func getFileIO(h *Hub, ctx context.Context) {
+func getFileIO(ctx context.Context, h *Hub) {
 	con := database.NewConn(db, instance, server, user, password)
 	d, err := sql.Open("sqlserver", con.Connectionstring())
 	if err != nil {
