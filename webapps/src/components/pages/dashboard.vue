@@ -9,6 +9,8 @@ import { Line } from 'vue-chartjs'
 import LineChart from '@/components/modules/LineChart.vue';
 import 'chartjs-plugin-streaming';
 import Vue from 'vue';
+import { w3cwebsocket } from 'websocket'
+const W3CWebSocket = w3cwebsocket
 
 export default {
   name: 'dashboard',
@@ -19,7 +21,7 @@ export default {
     return {
       chartdata: {},
       option: null,
-      time: null,
+      socket: new W3CWebSocket('ws://localhost:8080/ws')
     }
   },
   mounted () {
@@ -51,12 +53,16 @@ export default {
       },
       preservation: false
     }
+
+    this.socket.onmessage = function(event) {
+      let data = JSON.parse(event.data)
+      console.log(data)
+    }
     this.$refs.testchart.addDataset(this.chartdata.datasets[0])
     this.$refs.testchart.applyOption(this.option)
   },
   methods : {
     update: function() {
-      console.log(this)
       this.$refs.testchart.onReceive({
         index: 0,
         timestamp: Date.now(),

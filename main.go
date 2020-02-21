@@ -92,50 +92,6 @@ func main() {
 	}
 }
 
-// func serve(urlPrefix string, fs *packr.Box) echo.MiddlewareFunc {
-// 	fileserver := http.FileServer(fs)
-// 	if urlPrefix != "" {
-// 		fileserver = http.StripPrefix(urlPrefix, fileserver)
-// 	}
-// 	fmt.Println(fileserver)
-// 	return func(before echo.HandlerFunc) echo.HandlerFunc {
-// 		return func(c echo.Context) error {
-// 			err := before(c)
-// 			if err != nil {
-// 				if c, ok := err.(*echo.HTTPError); !ok || c.Code != http.StatusNotFound {
-// 					return err
-// 				}
-// 			}
-//
-// 			w, r := c.Response(), c.Request()
-// 			fmt.Println(urlPrefix)
-// 			fmt.Println(r.URL.Path)
-// 			p := strings.TrimPrefix(r.URL.Path, urlPrefix)
-// 			s, err := fs.FindString(p)
-// 			if err != nil {
-// 				fmt.Println("fuga")
-// 				fmt.Println(err)
-// 			} else {
-// 				fmt.Println("hoge")
-// 				fmt.Println(s)
-// 			}
-// 			if fs.Has(p) {
-// 				fileserver.ServeHTTP(w, r)
-// 				return nil
-// 			}
-// 			return err
-// 		}
-// 	}
-// }
-
-// 	if p := strings.TrimPrefix(filepath, prefix); len(p) < len(filepath) {
-// 		if _, err := b.Open(p); err != nil {
-// 			return false
-// 		}
-// 		return true
-// 	}
-// 	return false
-
 func action(c *cli.Context) error {
 	hub := newHub()
 	go hub.run()
@@ -145,8 +101,6 @@ func action(c *cli.Context) error {
 
 	box := packr.New("webapps", "./public")
 
-	// ec.GET("/", echo.WrapHandler(http.FileServer(box)))
-	// ec.GET("/*", echo.WrapHandler(http.FileServer(box)))
 	ec.GET("/*", echo.WrapHandler(http.StripPrefix("/", http.FileServer(box))))
 	ec.GET("/ws", func(c echo.Context) error {
 		serveWs(hub, c.Response(), c.Request())

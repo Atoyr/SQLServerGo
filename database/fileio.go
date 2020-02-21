@@ -7,6 +7,7 @@ import (
 )
 
 type FileIO struct {
+	ID                  int64     `json:"id"`
 	Datetime            time.Time `json:"datetime"`
 	DatabaseName        string    `json:"database_name"`
 	FileName            string    `json:"file_name"`
@@ -17,6 +18,7 @@ type FileIO struct {
 }
 
 type fileState struct {
+	ID                  int64
 	DatabaseName        string
 	FileName            string
 	FilePhysicalName    string
@@ -36,7 +38,8 @@ var beforeFileState map[string]fileState
 const FileIOQuery string = `
 	use master
 	select
-		 db.name as DatabaseName
+     ROW_NUMBER() OVER(ORDER BY  files.database_id,files.file_id) AS ID
+		,db.name as DatabaseName
 		,files.name as FileName
 		,files.physical_name as FilePhysicalName
 		,io.size_on_disk_bytes as FileSizeOnDiskBytes
@@ -78,6 +81,7 @@ func GetFileIOs(dbcontext *sql.DB) ([]FileIO, error) {
 	for rows.Next() {
 		fs := fileState{}
 		if err := rows.Scan(
+			&fs.ID,
 			&fs.DatabaseName,
 			&fs.FileName,
 			&fs.FilePhysicalName,
@@ -97,6 +101,7 @@ func GetFileIOs(dbcontext *sql.DB) ([]FileIO, error) {
 			rangeMs := fs.SampleMs - bfs.SampleMs
 			mag := float64(1000.00 / rangeMs)
 			fileIO := FileIO{}
+			fileIO.ID = fs.ID
 			fileIO.Datetime = datetime
 			fileIO.DatabaseName = fs.DatabaseName
 			fileIO.FileName = fs.FileName

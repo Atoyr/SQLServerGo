@@ -38,11 +38,11 @@ export default {
     },
     addDataset: function(dataset) {
       this.cd.datasets.push(dataset)
-    this.renderChart(this.cd,this.op)
+      this.renderChart(this.cd,this.op)
     },
     applyOption: function(option) {
       this.op = option
-    this.renderChart(this.cd,this.op)
+      this.renderChart(this.cd,this.op)
     },
 
     onReceive: function (event) {
