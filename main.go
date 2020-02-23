@@ -96,7 +96,7 @@ func action(c *cli.Context) error {
 	hub := newHub()
 	go hub.run()
 	back := context.Background()
-	go getFileIO(back, hub)
+	go getDatabaseFileIO(back, hub)
 	ec := echo.New()
 
 	box := packr.New("webapps", "./public")
@@ -113,7 +113,7 @@ func action(c *cli.Context) error {
 	return nil
 }
 
-func getFileIO(ctx context.Context, h *Hub) {
+func getDatabaseFileIO(ctx context.Context, h *Hub) {
 	con := database.NewConn(db, instance, server, user, password)
 	d, err := sql.Open("sqlserver", con.Connectionstring())
 	if err != nil {
@@ -126,7 +126,7 @@ func getFileIO(ctx context.Context, h *Hub) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			ios, err := database.GetFileIOs(d)
+			ios, err := database.GetDatabaseFileIOs(d)
 			if err != nil {
 				fmt.Println(err)
 			} else {
