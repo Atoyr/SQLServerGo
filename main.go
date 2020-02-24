@@ -19,6 +19,7 @@ import (
 	"github.com/atoyr/SQLServerGo/database"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/urfave/cli/v2"
 )
 
@@ -98,6 +99,7 @@ func action(c *cli.Context) error {
 	back := context.Background()
 	go getDatabaseFileIO(back, hub)
 	ec := echo.New()
+	ec.Use(middleware.CORS())
 
 	box := packr.New("webapps", "./public")
 
@@ -106,6 +108,8 @@ func action(c *cli.Context) error {
 		serveWs(hub, c.Response(), c.Request())
 		return nil
 	})
+	ec.GET("/api/databaseFiles", handleDatabaseFiles)
+
 	err := ec.Start(port)
 	if err != nil {
 		return err
