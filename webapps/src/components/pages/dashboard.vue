@@ -1,7 +1,6 @@
 <template>
   <div>
     <line-chart :chartdata="chartdata" :options="option" ref="testchart"></line-chart>
-    <button v-on:click="update()"></button>
   </div>
 </template>
 <script>
@@ -21,21 +20,39 @@ export default {
     return {
       chartdata: {},
       option: null,
-      socket: new W3CWebSocket('ws://localhost:8080/ws')
+      socket: new W3CWebSocket(`ws://${window.location}/ws`)
     }
   },
   mounted () {
-    this.chartdata = {
-      datasets: [{
-        label: 'Dataset 1',
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        lineTension: 0,
-        borderDash: [8, 4],
-        data: []
-      }]
-    }
-    this.option = {
+//    this.chartdata = {
+//      datasets: []
+//    };
+
+    fetch(`http://${window.location}/api/databaseFiles`)
+      .then(response => {
+        return response.json();
+      })
+      .then(res => {
+        for(const f of res){
+          this.$refs.testchart.addDataset(
+            {
+              label: f.file_name,
+              data: []
+            }
+          );
+        }
+      })
+//    this.chartdata = {
+//      datasets: [{
+//        label: 'Dataset 1',
+//        borderColor: 'rgb(255, 99, 132)',
+//        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+//        lineTension: 0,
+//        borderDash: [8, 4],
+//        data: []
+//      }]
+//    }
+    this.$refs.testchart.applyOption({
       scales: {
         xAxes: [{
           type: 'realtime',
@@ -51,24 +68,28 @@ export default {
           }
         }]
       },
-      preservation: false
-    }
+      preservation: true
+    });
 
     this.socket.onmessage = function(event) {
       let data = JSON.parse(event.data)
-      console.log(data)
+      for(const f of data){
+        this.$refs.testchart.onReceive({
+          index: f.id,
+          timestamp: f.datetime,
+          value: f.read_bytes_per_sec
+        })
+      }
     }
-    this.$refs.testchart.addDataset(this.chartdata.datasets[0])
-    this.$refs.testchart.applyOption(this.option)
   },
   methods : {
-    update: function() {
-      this.$refs.testchart.onReceive({
-        index: 0,
-        timestamp: Date.now(),
-        value: 100
-      })
-    },
+  //  update: function() {
+  //    this.$refs.testchart.onReceive({
+  //      index: 0,
+  //      timestamp: Date.now(),
+  //      value: 100
+  //    })
+  //  },
   }
 }
 </script>
