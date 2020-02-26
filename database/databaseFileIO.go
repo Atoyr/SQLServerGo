@@ -71,7 +71,10 @@ func GetDatabaseFileIOs(dbcontext *sql.DB) ([]DatabaseFileIO, error) {
 		}
 		if bfs, ok := beforeFileState[fs.FilePhysicalName]; ok {
 			rangeMs := fs.SampleMs - bfs.SampleMs
-			mag := float64(1000.00 / rangeMs)
+			var mag float64 = 0
+			if rangeMs > 0 {
+				mag = float64(1000.00 / rangeMs)
+			}
 			fileIO := DatabaseFileIO{}
 			fileIO.ID = fs.ID
 			fileIO.Datetime = datetime
