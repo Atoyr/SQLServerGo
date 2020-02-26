@@ -5,12 +5,15 @@
   </div>
 </template>
 <script>
-import { Line } from 'vue-chartjs'
+import { Line } from 'vue-chartjs';
 import LineChart from '@/components/modules/LineChart.vue';
 import 'chartjs-plugin-streaming';
 import Vue from 'vue';
-import { w3cwebsocket } from 'websocket'
-const W3CWebSocket = w3cwebsocket
+import { w3cwebsocket } from 'websocket';
+import 'chartjs-plugin-colorschemes';
+import { RedGold21 } from 'chartjs-plugin-colorschemes/src/colorschemes/colorschemes.tableau'
+
+const W3CWebSocket = w3cwebsocket;
 
 export default {
   name: 'dashboard',
@@ -65,6 +68,11 @@ export default {
             min:0
           }
         }]
+      },
+      plugins: {
+        colorschemes: {
+          scheme: RedGold21
+        }
       },
       legend: {
         position: 'right'
