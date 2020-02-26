@@ -41,7 +41,8 @@ func GetDatabaseFileIOs(dbcontext *sql.DB) ([]DatabaseFileIO, error) {
 	}
 
 	ctx := context.Background()
-	datetime := time.Now()
+	datetime := time.Now().Truncate(time.Second)
+
 	rows, err := dbcontext.QueryContext(ctx, DatabaseFileIOQuery)
 	if err != nil {
 		return nil, err

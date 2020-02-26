@@ -21,9 +21,13 @@ export default {
     }
   },
   mounted () {
-    console.log(this)
-    this.cd = {datasets: [ ]}
-    //this.renderChart(this.chartdata, this.options)
+    this.cd = {datasets: [ ]};
+    this.op = {
+      scales: {
+        xAxes: [ ],
+        yAxes: [ ]
+      }
+    };
     this.renderChart(this.cd,this.op)
     this.$data._chart.update({
       preservation: true
@@ -31,10 +35,11 @@ export default {
   },
   methods: {
     update: function () {
-      console.log(this.chartdata)
-      this.$data._chart.update({
-        preservation: true
-      });
+      if (!this.op.scales.xAxes[0].realtime.pause){
+        this.$data._chart.update({
+          preservation: true
+        });
+      }
     },
     addDataset: function(dataset) {
       this.cd.datasets.push(dataset)
@@ -46,13 +51,9 @@ export default {
     },
 
     onReceive: function (event) {
-      console.log(event)
       this.cd.datasets[event.index].data.push({
         x: event.timestamp,
         y: event.value
-      });
-      this._data._chart.update({
-        preservation: true
       });
     }
   },

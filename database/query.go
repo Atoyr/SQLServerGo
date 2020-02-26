@@ -12,9 +12,7 @@ const DatabaseFilesQuery string = `
 	inner join 
 		sys.databases as db
 	on 
-		file.database_id = db.database_id
-	inner join 
-		sys.master_files as files
+		files.database_id = db.database_id
   `
 
 const DatabaseFileIOQuery string = `

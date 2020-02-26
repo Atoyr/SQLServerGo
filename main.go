@@ -134,6 +134,9 @@ func getDatabaseFileIO(ctx context.Context, h *Hub) {
 			if err != nil {
 				fmt.Println(err)
 			} else {
+				if len(ios) > 1000 {
+					ios = ios[:1000]
+				}
 				data, _ := json.Marshal(ios)
 				h.broadcast <- data
 			}

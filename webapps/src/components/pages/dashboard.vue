@@ -1,6 +1,7 @@
 <template>
   <div>
-    <line-chart :chartdata="chartdata" :options="option" ref="testchart"></line-chart>
+    <line-chart class="chart" ref="readIOChart" :height="540"></line-chart>
+    <line-chart class="chart" ref="writeIOChart" :height="540"></line-chart>
   </div>
 </template>
 <script>
@@ -18,78 +19,82 @@ export default {
   },
   data ()  {
     return {
-      chartdata: {},
-      option: null,
-      socket: new W3CWebSocket(`ws://${window.location}/ws`)
+      socket: new W3CWebSocket(`ws://${window.location.host}/ws`),
+      isPause: false
     }
   },
   mounted () {
-//    this.chartdata = {
-//      datasets: []
-//    };
-
-    fetch(`http://${window.location}/api/databaseFiles`)
-      .then(response => {
-        return response.json();
-      })
-      .then(res => {
-        for(const f of res){
-          this.$refs.testchart.addDataset(
-            {
-              label: f.file_name,
-              data: []
-            }
-          );
-        }
-      })
-//    this.chartdata = {
-//      datasets: [{
-//        label: 'Dataset 1',
-//        borderColor: 'rgb(255, 99, 132)',
-//        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-//        lineTension: 0,
-//        borderDash: [8, 4],
-//        data: []
-//      }]
-//    }
-    this.$refs.testchart.applyOption({
+    fetch(`${window.location.origin}/api/databaseFiles`)
+    .then(response => {
+      return response.json();
+    })
+    .then(res => {
+      for(const f of res){
+        this.$refs.readIOChart.addDataset(
+          {
+            label: f.file_name,
+            data: []
+          }
+        );
+        this.$refs.writeIOChart.addDataset(
+          {
+            label: f.file_name,
+            data: []
+          }
+        );
+      }
+    })
+    let option = {
       scales: {
         xAxes: [{
           type: 'realtime',
           realtime: {
-            delay: 2000,
-            refresh: 1000
-          }
+            duration: 40000,
+            delay: 5000,
+            ttl: 60000,
+            pause: this.isPause
+          },
         }],
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: 'value'
+          },
+          ticks:{
+            beginAtZero: true,
+            min:0
           }
         }]
       },
-      preservation: true
-    });
+      legend: {
+        position: 'right'
+      },
+      preservation: true,
+      responsive: true,
+      maintainAspectRatio: false
+    }
+    this.$refs.readIOChart.applyOption(option)
+    this.$refs.writeIOChart.applyOption(option)
 
-    this.socket.onmessage = function(event) {
+    this.socket.onmessage = (event) => {
       let data = JSON.parse(event.data)
       for(const f of data){
-        this.$refs.testchart.onReceive({
-          index: f.id,
-          timestamp: f.datetime,
+        this.$refs.readIOChart.onReceive({
+          index: f.id - 1,
+          timestamp: Date.parse(f.datetime),
           value: f.read_bytes_per_sec
-        })
+        });
+        this.$refs.writeIOChart.onReceive({
+          index: f.id - 1,
+          timestamp: Date.parse(f.datetime),
+          value: f.write_bytes_per_sec
+        });
       }
+      this.$refs.readIOChart.update()
+      this.$refs.writeIOChart.update()
     }
   },
   methods : {
-  //  update: function() {
-  //    this.$refs.testchart.onReceive({
-  //      index: 0,
-  //      timestamp: Date.now(),
-  //      value: 100
-  //    })
-  //  },
   }
 }
 </script>
