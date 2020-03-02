@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -94,6 +95,10 @@ func main() {
 }
 
 func action(c *cli.Context) error {
+	err, ok := check()
+	if ok == false {
+		return err
+	}
 	hub := newHub()
 	go hub.run()
 	back := context.Background()
@@ -110,11 +115,47 @@ func action(c *cli.Context) error {
 	})
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 
-	err := ec.Start(port)
+	ec.HideBanner = true
+	err = ec.Start(port)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+var okstring = "[\x1b[32m OK \x1b[0m]"
+var failstring = "[\x1b[31mFAIL\x1b[0m]"
+
+func check() (error, bool) {
+	// Check DB Status
+	con := database.NewConn(db, instance, server, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		fmt.Printf("%s SQL Server Connection %s\\%s\n", failstring, server, instance)
+		return err, false
+	}
+	defer d.Close()
+	err = d.Ping()
+	if err != nil {
+		fmt.Printf("%s SQL Server Connection %s\\%s\n", failstring, server, instance)
+		return err, false
+	} else {
+		fmt.Printf("%s SQL Server Connection %s\\%s\n", okstring, server, instance)
+	}
+
+	// Check HTTP Listen
+	if port[0] != ':' {
+		port = fmt.Sprintf(":%s", port)
+	}
+	l, err := net.Listen("tcp", port)
+	if err == nil {
+		fmt.Printf("%s HTTP Listen Port %s\n", okstring, port)
+		defer l.Close()
+	} else {
+		fmt.Printf("%s HTTP Listen Port %s\n", failstring, port)
+		return err, false
+	}
+	return nil, true
 }
 
 func getDatabaseFileIO(ctx context.Context, h *Hub) {
@@ -124,6 +165,7 @@ func getDatabaseFileIO(ctx context.Context, h *Hub) {
 		log.Println(err)
 		os.Exit(1)
 	}
+	defer d.Close()
 	t := time.NewTicker(1 * time.Second)
 	for {
 		select {
