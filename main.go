@@ -30,6 +30,7 @@ var user string
 var password string
 var db string
 var port string
+var tickRate int64
 
 func main() {
 	app := new(cli.App)
@@ -84,6 +85,13 @@ func main() {
 			Value:       ":8080",
 			Usage:       "http access port no",
 			Destination: &port,
+		},
+		&cli.Int64Flag{
+			Name:        "tickrate",
+			Aliases:     []string{"tr"},
+			Value:       1,
+			Usage:       "performance data tick rate",
+			Destination: &tickRate,
 		},
 	}
 
@@ -166,7 +174,7 @@ func getDatabaseFileIO(ctx context.Context, h *Hub) {
 		os.Exit(1)
 	}
 	defer d.Close()
-	t := time.NewTicker(1 * time.Second)
+	t := time.NewTicker(time.Duration(tickRate) * time.Second)
 	for {
 		select {
 		case <-ctx.Done():
