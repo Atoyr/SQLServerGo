@@ -75,6 +75,7 @@ export default {
         }
       },
       legend: {
+        display: false,
         position: 'right'
       },
       preservation: true,
