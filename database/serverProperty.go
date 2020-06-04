@@ -19,16 +19,17 @@ type ServerProperty struct {
 
 func GetServerProperty(dbcontext *sql.DB) (ServerProperty, error) {
 	ctx := context.Background()
-	sp := new(ServerProperty)
 	row := dbcontext.QueryRowContext(ctx, ServerInfoQuery)
+
+	sp := new(ServerProperty)
 	if err := row.Scan(
-		sp.MachineName,
-		sp.InstanceName,
-		sp.ServerName,
-		sp.ProductVersion,
-		sp.ProductMajorVersion,
-		sp.ProductLevel,
-		sp.Edition); err != nil {
+		&sp.MachineName,
+		&sp.InstanceName,
+		&sp.ServerName,
+		&sp.ProductVersion,
+		&sp.ProductMajorVersion,
+		&sp.ProductLevel,
+		&sp.Edition); err != nil {
 		return *sp, err
 	}
 	sp.Version = GetVersion(sp.ProductMajorVersion)

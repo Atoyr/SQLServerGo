@@ -13,8 +13,6 @@ func handleDatabaseFiles(c echo.Context) error {
 	con := db.NewConn(database, instance, sqlserver, user, password)
 	d, err := sql.Open("sqlserver", con.Connectionstring())
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println(con)
 		return err
 	}
 	dbFiles, err := db.GetDatabaseFiles(d)
@@ -23,4 +21,19 @@ func handleDatabaseFiles(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, dbFiles)
+}
+
+func handleInstance(c echo.Context) error {
+	con := db.NewConn(database, instance, sqlserver, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		return err
+	}
+	instance, err := db.GetServerProperty(d)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println(instance)
+		return err
+	}
+	return c.JSON(http.StatusOK, instance)
 }

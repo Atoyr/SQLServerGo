@@ -122,7 +122,7 @@ func action(c *cli.Context) error {
 	})
 
 	// webapi
-	ec.GET("/api/instance", func(c echo.Context) error { return nil })
+	ec.GET("/api/instance", handleInstance)
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 
 	ec.HideBanner = true
