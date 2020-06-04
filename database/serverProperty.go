@@ -7,30 +7,20 @@ import (
 )
 
 type ServerProperty struct {
-	MachineName         string
-	InstanceName        string
-	ServerName          string
-	ProductVersion      string
-	ProductMajorVersion string
-	Version             string
-	Edition             string
-	ProductLevel        string
+	MachineName         string `json:"machineName"`
+	InstanceName        string `json:"instanceName"`
+	ServerName          string `json:"serverName"`
+	ProductVersion      string `json:"productVersion"`
+	ProductMajorVersion string `json:"productMajorVersion"`
+	Version             string `json:"version"`
+	Edition             string `json:"edition"`
+	ProductLevel        string `json:"productLevel"`
 }
 
 func GetServerProperty(dbcontext *sql.DB) (ServerProperty, error) {
 	ctx := context.Background()
 	sp := new(ServerProperty)
-	tsql := `
-    SELECT 
-      SERVERPROPERTY('MachineName')
-    , SERVERPROPERTY('InstanceName')
-    , SERVERPROPERTY('ServerName')
-    , SERVERPROPERTY('productversion')
-    , SERVERPROPERTY('ProductMajorVersion')
-    , SERVERPROPERTY('ProductLevel')
-    , SERVERPROPERTY('Edition')
-  `
-	row := dbcontext.QueryRowContext(ctx, tsql)
+	row := dbcontext.QueryRowContext(ctx, ServerInfoQuery)
 	if err := row.Scan(
 		sp.MachineName,
 		sp.InstanceName,

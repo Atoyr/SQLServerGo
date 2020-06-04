@@ -17,15 +17,7 @@ type Database struct {
 func NewDatabases(dbcontext *sql.DB) ([]Database, error) {
 	ctx := context.Background()
 	ds := make([]Database, 0, 10)
-	tsql := `
-    SELECT 
-       name
-      ,database_id
-      ,state_desc
-      ,recovery_model_desc
-    FROM sys.databases
-  `
-	rows, err := dbcontext.QueryContext(ctx, tsql)
+	rows, err := dbcontext.QueryContext(ctx, DatabasesQuery)
 	if err != nil {
 		return nil, err
 	}

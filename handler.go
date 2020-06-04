@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/atoyr/SQLServerGo/database"
+	db "github.com/atoyr/SQLServerGo/database"
 	"github.com/labstack/echo"
 )
 
 func handleDatabaseFiles(c echo.Context) error {
-	con := database.NewConn(db, instance, server, user, password)
+	con := db.NewConn(database, instance, sqlserver, user, password)
 	d, err := sql.Open("sqlserver", con.Connectionstring())
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println(con)
 		return err
 	}
-	dbFiles, err := database.GetDatabaseFiles(d)
+	dbFiles, err := db.GetDatabaseFiles(d)
 	if err != nil {
 		fmt.Println(err)
 		return err

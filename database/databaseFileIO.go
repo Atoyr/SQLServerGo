@@ -35,6 +35,7 @@ type fileState struct {
 
 var beforeFileState map[string]fileState
 
+// GetDataseFileIOs is getting database file io with query.
 func GetDatabaseFileIOs(dbcontext *sql.DB) ([]DatabaseFileIO, error) {
 	if beforeFileState == nil {
 		beforeFileState = map[string]fileState{}
@@ -70,11 +71,13 @@ func GetDatabaseFileIOs(dbcontext *sql.DB) ([]DatabaseFileIO, error) {
 			return nil, err
 		}
 		if bfs, ok := beforeFileState[fs.FilePhysicalName]; ok {
+			// 1秒あたりの割合計算用の係数を割り出し
 			rangeMs := fs.SampleMs - bfs.SampleMs
 			var mag float64 = 0
 			if rangeMs > 0 {
 				mag = float64(1000.00 / rangeMs)
 			}
+
 			fileIO := DatabaseFileIO{}
 			fileIO.ID = fs.ID
 			fileIO.Datetime = datetime

@@ -7,35 +7,33 @@ package main
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"os"
-	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
 
-	"github.com/atoyr/SQLServerGo/database"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/urfave/cli/v2"
 )
 
-var server string
+var sqlserver string
 var instance string
 var user string
 var password string
-var db string
-var port string
+var database string
+
+var webport int
 var tickRate int64
 
 func main() {
 	app := new(cli.App)
 	app.Name = "SQLServer Tools"
-	app.Usage = "run apps and access http://localhost:8080"
+	app.Version = "0.1.0"
+	app.Usage = "run apps and access http://localhost:<httpport>"
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:        "server",
@@ -43,7 +41,7 @@ func main() {
 			Value:       "",
 			Usage:       "SQLServer Server Name",
 			EnvVars:     []string{"DBSERVER"},
-			Destination: &server,
+			Destination: &sqlserver,
 			Required:    true,
 		},
 		&cli.StringFlag{
@@ -53,7 +51,6 @@ func main() {
 			Usage:       "SQLServer Server Instance Name",
 			EnvVars:     []string{"DBINSTANCE"},
 			Destination: &instance,
-			Required:    true,
 		},
 		&cli.StringFlag{
 			Name:        "user",
@@ -77,14 +74,14 @@ func main() {
 			Aliases:     []string{"d"},
 			Value:       "master",
 			Usage:       "SQLServer Server using database",
-			Destination: &db,
+			Destination: &database,
 		},
-		&cli.StringFlag{
+		&cli.IntFlag{
 			Name:        "httpport",
 			Aliases:     []string{"hp"},
-			Value:       ":8080",
+			Value:       8080,
 			Usage:       "http access port no",
-			Destination: &port,
+			Destination: &webport,
 		},
 		&cli.Int64Flag{
 			Name:        "tickrate",
@@ -98,13 +95,13 @@ func main() {
 	app.Action = action
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Println(err)
+		fmt.Printf("%s %s", failstring, err)
 	}
 }
 
 func action(c *cli.Context) error {
-	err, ok := check()
-	if ok == false {
+	err := tryDatabaseConnect()
+	if err != nil {
 		return err
 	}
 	hub := newHub()
@@ -114,82 +111,89 @@ func action(c *cli.Context) error {
 	ec := echo.New()
 	ec.Use(middleware.CORS())
 
+	// frontend
 	box := packr.New("webapps", "./public")
-
 	ec.GET("/*", echo.WrapHandler(http.StripPrefix("/", http.FileServer(box))))
-	ec.GET("/ws", func(c echo.Context) error {
+
+	// websocket
+	ec.GET("/ws/fileio", func(c echo.Context) error {
 		serveWs(hub, c.Response(), c.Request())
 		return nil
 	})
+
+	// webapi
+	ec.GET("/api/instance", func(c echo.Context) error { return nil })
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 
 	ec.HideBanner = true
-	err = ec.Start(port)
+
+	err = ec.Start(fmt.Sprintf(":%d", webport))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-var okstring = "[\x1b[32m OK \x1b[0m]"
-var failstring = "[\x1b[31mFAIL\x1b[0m]"
+const okstring = "[\x1b[32m OK \x1b[0m]"
+const failstring = "[\x1b[31mFAIL\x1b[0m]"
+const infostring = "[\x1b[36mINFO\x1b[0m]"
+
+func connectionstring() string {
+	var ret = make([]byte, 0, 1024)
+	ret = append(ret, "server="...)
+	ret = append(ret, sqlserver...)
+	if instance != "" {
+		ret = append(ret, "\\"...)
+		ret = append(ret, instance...)
+	}
+	ret = append(ret, ";user id="...)
+	ret = append(ret, user...)
+	ret = append(ret, ";password="...)
+	ret = append(ret, password...)
+	ret = append(ret, ";database="...)
+	ret = append(ret, database...)
+	return string(ret)
+}
+
+func tryDatabaseConnect() error {
+	fmt.Println(connectionstring())
+	d, err := sql.Open("sqlserver", connectionstring())
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	// err = d.Ping()
+	// if err != nil {
+	// 	fmt.Println(connectionstring())
+	// 	return err
+	// }
+	return nil
+}
 
 func check() (error, bool) {
 	// Check DB Status
-	con := database.NewConn(db, instance, server, user, password)
-	d, err := sql.Open("sqlserver", con.Connectionstring())
+	d, err := sql.Open("sqlserver", connectionstring())
 	if err != nil {
-		fmt.Printf("%s SQL Server Connection %s\\%s\n", failstring, server, instance)
+		fmt.Printf("%s SQL Server Connection %s\\%s\n", failstring, sqlserver, instance)
 		return err, false
 	}
 	defer d.Close()
 	err = d.Ping()
 	if err != nil {
-		fmt.Printf("%s SQL Server Connection %s\\%s\n", failstring, server, instance)
+		fmt.Printf("%s SQL Server Connection %s\\%s\n", failstring, sqlserver, instance)
 		return err, false
 	} else {
-		fmt.Printf("%s SQL Server Connection %s\\%s\n", okstring, server, instance)
+		fmt.Printf("%s SQL Server Connection %s\\%s\n", okstring, sqlserver, instance)
 	}
 
 	// Check HTTP Listen
-	if port[0] != ':' {
-		port = fmt.Sprintf(":%s", port)
-	}
-	l, err := net.Listen("tcp", port)
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", webport))
 	if err == nil {
-		fmt.Printf("%s HTTP Listen Port %s\n", okstring, port)
+		fmt.Printf("%s HTTP Listen Port %d\n", okstring, webport)
 		defer l.Close()
 	} else {
-		fmt.Printf("%s HTTP Listen Port %s\n", failstring, port)
+		fmt.Printf("%s HTTP Listen Port %d\n", failstring, webport)
 		return err, false
 	}
 	return nil, true
-}
-
-func getDatabaseFileIO(ctx context.Context, h *Hub) {
-	con := database.NewConn(db, instance, server, user, password)
-	d, err := sql.Open("sqlserver", con.Connectionstring())
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-	defer d.Close()
-	t := time.NewTicker(time.Duration(tickRate) * time.Second)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-t.C:
-			ios, err := database.GetDatabaseFileIOs(d)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				if len(ios) > 1000 {
-					ios = ios[:1000]
-				}
-				data, _ := json.Marshal(ios)
-				h.broadcast <- data
-			}
-		}
-	}
 }
