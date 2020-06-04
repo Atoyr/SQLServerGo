@@ -1,5 +1,15 @@
 package database
 
+const DatabasesQuery string = `
+  use master
+  SELECT 
+     name
+    ,database_id
+    ,state_desc
+    ,recovery_model_desc
+  FROM sys.databases
+`
+
 const DatabaseFilesQuery string = `
 	use master
 	select
@@ -8,9 +18,9 @@ const DatabaseFilesQuery string = `
 		,files.name as FileName
 		,files.physical_name as FilePhysicalName
 	from 
-		sys.master_files as files
+		sys.master_files as files with(nolock)
 	inner join 
-		sys.databases as db
+		sys.databases as db with(nolock)
 	on 
 		files.database_id = db.database_id
   `
@@ -34,12 +44,23 @@ const DatabaseFileIOQuery string = `
 	from 
 		sys.dm_io_virtual_file_stats (null,null ) as io
 	inner join 
-		sys.databases as db
+		sys.databases as db with(nolock)
 	on 
 		io.database_id = db.database_id
 	inner join 
-		sys.master_files as files
+		sys.master_files as files with(nolock)
 	on 
 		io.database_id = files.database_id
 	and io.file_id = files.file_id
+  `
+
+const ServerInfoQuery string = `
+    SELECT 
+      SERVERPROPERTY('MachineName')
+    , SERVERPROPERTY('InstanceName')
+    , SERVERPROPERTY('ServerName')
+    , SERVERPROPERTY('productversion')
+    , SERVERPROPERTY('ProductMajorVersion')
+    , SERVERPROPERTY('ProductLevel')
+    , SERVERPROPERTY('Edition')
   `
