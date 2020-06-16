@@ -13,7 +13,14 @@
           <v-list-item-avatar>
             <img src="@/static/logo-sql-server.png" class="logo" @click.stop="mini = !mini"></img>
           </v-list-item-avatar>
-          <v-list-item-title>{{dbname}} fooo</v-list-item-title>
+            <v-tooltip bottom>
+              <template v-slot:activator="{on,attrs}">
+          <v-list-item-title v-bind="attrs" v-on="on">
+              {{instanceName}}
+          </v-list-item-title>
+              </template>
+              <span>{{instanceName}}</span>
+            </v-tooltip>
           <v-btn icon @click.stop="mini = !mini">
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
@@ -30,6 +37,7 @@
 </template>
 
 <script>
+import { mapGetters} from 'vuex'
 export default {
   data() {
     return {
@@ -38,12 +46,9 @@ export default {
       mini: true,
     }
   },
-  fetch({ store, params}) {
-    return axios.get(`http://${this.$getHost()}/api/instance`)
-    .then((res) => {
-      console.log(res)
-    })
-  }
+  computed: {
+      ...mapGetters(["instanceName"])
+    },
 }
 </script>
 

@@ -64,3 +64,19 @@ const ServerInfoQuery string = `
     , SERVERPROPERTY('ProductLevel')
     , SERVERPROPERTY('Edition')
   `
+
+const CpuUsedQuery string = `
+  SELECT TOP 1
+      record.value('(./Record/@id)[1]', 'int') AS record_id
+    , record.value('(./Record/SchedulerMonitorEvent/SystemHealth/SystemIdle)[1]', 'int') AS [SystemIdle]
+    , record.value('(./Record/SchedulerMonitorEvent/SystemHealth/ProcessUtilization)[1]', 'int') AS [SQLProcessUtilization]
+    , [timestamp]
+  FROM (
+    SELECT [timestamp]
+    , convert(XML, record) AS [record]
+    FROM sys.dm_os_ring_buffers with(nolock)
+    WHERE ring_buffer_type = N'RING_BUFFER_SCHEDULER_MONITOR'
+    AND record LIKE '%<systemHealth>%'
+  ) AS x
+  ORDER BY timestamp desc
+`
