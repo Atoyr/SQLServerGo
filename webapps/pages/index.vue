@@ -13,7 +13,8 @@ export default {
     InputChart
   },
    async fetch ({ store, params }) {
-         await store.dispatch('fetchInstance');
-       },
+     console.log("fetch")
+     await store.dispatch('database/fetchServerProperty');
+   },
 }
 </script>

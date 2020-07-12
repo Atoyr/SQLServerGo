@@ -16,10 +16,10 @@
             <v-tooltip bottom>
               <template v-slot:activator="{on,attrs}">
           <v-list-item-title v-bind="attrs" v-on="on">
-              {{instanceName}}
+              {{InstanceName}}
           </v-list-item-title>
               </template>
-              <span>{{instanceName}}</span>
+              <span>{{InstanceName}}</span>
             </v-tooltip>
           <v-btn icon @click.stop="mini = !mini">
             <v-icon>mdi-chevron-left</v-icon>
@@ -47,7 +47,7 @@ export default {
     }
   },
   computed: {
-      ...mapGetters(["instanceName"])
+      ...mapGetters('database',["InstanceName"])
     },
 }
 </script>
