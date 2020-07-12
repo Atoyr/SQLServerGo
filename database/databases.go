@@ -14,6 +14,16 @@ type Database struct {
 	RecoveryModel string `json:"recovery_model"`
 }
 
+const DatabasesQuery string = `
+  use master
+  SELECT 
+     name
+    ,database_id
+    ,state_desc
+    ,recovery_model_desc
+  FROM sys.databases
+`
+
 func NewDatabases(dbcontext *sql.DB) ([]Database, error) {
 	ctx := context.Background()
 	ds := make([]Database, 0, 10)

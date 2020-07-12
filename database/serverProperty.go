@@ -17,6 +17,17 @@ type ServerProperty struct {
 	ProductLevel        string `json:"productLevel"`
 }
 
+const ServerInfoQuery string = `
+    SELECT 
+      SERVERPROPERTY('MachineName')
+    , SERVERPROPERTY('InstanceName')
+    , SERVERPROPERTY('ServerName')
+    , SERVERPROPERTY('productversion')
+    , SERVERPROPERTY('ProductMajorVersion')
+    , SERVERPROPERTY('ProductLevel')
+    , SERVERPROPERTY('Edition')
+  `
+
 func GetServerProperty(dbcontext *sql.DB) (ServerProperty, error) {
 	ctx := context.Background()
 	row := dbcontext.QueryRowContext(ctx, ServerInfoQuery)
