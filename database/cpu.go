@@ -6,10 +6,11 @@ import (
 )
 
 type Cpu struct {
-	ID                    int64   `json:"id"`
-	SystemIdle            int64   `json:"system_idle"`
-	SqlProcessUtilization int64   `json:"sql_process_utilization"`
-	Timestamp             float64 `json:"timestamp"`
+	ID                      int64   `json:"id"`
+	SystemIdle              int64   `json:"system_idle"`
+	SqlProcessUtilization   int64   `json:"sql_process_utilization"`
+	OtherProcessUtilization int64   `json:"other_process_utilization"`
+	Timestamp               float64 `json:"timestamp"`
 }
 
 func GetCpuUsed(dbcontext *sql.DB) (Cpu, error) {
@@ -25,5 +26,6 @@ func GetCpuUsed(dbcontext *sql.DB) (Cpu, error) {
 	); err != nil {
 		return *c, err
 	}
+	c.OtherProcessUtilization = 100 - (c.SystemIdle + c.SqlProcessUtilization)
 	return *c, nil
 }
