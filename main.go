@@ -164,11 +164,11 @@ func tryDatabaseConnect() error {
 		return err
 	}
 	defer d.Close()
-	// err = d.Ping()
-	// if err != nil {
-	// 	fmt.Println(connectionstring())
-	// 	return err
-	// }
+	err = d.Ping()
+	if err != nil {
+		fmt.Println(connectionstring())
+		return err
+	}
 	return nil
 }
 
