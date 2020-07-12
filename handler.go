@@ -51,3 +51,17 @@ func handleCpuUsed(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, cpu)
 }
+
+func handleErrorLogs(c echo.Context) error {
+	con := db.NewConn(database, instance, sqlserver, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		return err
+	}
+	els, err := db.GetErrorLogs(d)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return c.JSON(http.StatusOK, els)
+}

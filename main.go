@@ -125,6 +125,7 @@ func action(c *cli.Context) error {
 	ec.GET("/api/instance", handleInstance)
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 	ec.GET("/api/cpuUsed", handleCpuUsed)
+	ec.GET("/api/errorlogs", handleErrorLogs)
 
 	ec.HideBanner = true
 
