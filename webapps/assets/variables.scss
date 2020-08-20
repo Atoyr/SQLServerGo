@@ -2,3 +2,45 @@
 //
 // The variables you want to modify
 // $font-size-root: 20px;
+@import '~vuetify/src/styles/styles.sass';
+$material-light: map-merge($material-light, (
+  'background': var(--v-background-base, map-get($material-light, 'background')) !important,
+  ));
+$material-dark: map-merge($material-dark, (
+    'background': var(--v-background-base, map-get($material-dark, 'background')) !important,
+    ));
+
+
+// h1.label{
+//   position: relative;
+//   color: #8CDDD9;
+//   font-family: "游ゴシック体", YuGothic, "游ゴシック Medium", "Yu Gothic Medium", "游ゴシック", "Yu Gothic", sans-serif;
+//   font-weight: lighter;
+//   margin-left: 16px;
+// }
+// 
+// h1.left-label{
+//   position: relative;
+//   color: #8CDDD9;
+//   font-family: "游ゴシック体", YuGothic, "游ゴシック Medium", "Yu Gothic Medium", "游ゴシック", "Yu Gothic", sans-serif;
+//   font-weight: lighter;
+//   margin-left: 16px;
+// 
+//   &:before{
+//     content:"";
+//     position: absolute;
+//     left: -20px;
+//     bottom: 0;
+//     width: 12px;
+//     height: 100%;
+//     background: linear-gradient(
+//     -45deg,
+//     #00080c 25%, #8CDDD9 25%,
+//     #8CDDD9 50%, #00080c 50%,
+//     #00080c 75%, #8CDDD9 75%,
+//     #8CDDD9
+//     );
+//     background-size: 12px 12px;
+//   }
+// }
+// 

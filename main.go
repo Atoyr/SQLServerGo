@@ -104,10 +104,20 @@ func action(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	hub := newHub()
-	go hub.run()
+	fileIOhub := newHub()
+	cpuUsedHub := newHub()
+	memoryHub := newHub()
+	bufferCacheHub := newHub()
+	go fileIOhub.run()
+	go cpuUsedHub.run()
+	go memoryHub.run()
+	go bufferCacheHub.run()
+
 	back := context.Background()
-	go getDatabaseFileIO(back, hub)
+	go getDatabaseFileIO(back, fileIOhub)
+	go getCpuUsed(back, cpuUsedHub)
+	go getMemory(back, memoryHub)
+	go getBufferCache(back, bufferCacheHub)
 	ec := echo.New()
 	ec.Use(middleware.CORS())
 
@@ -117,7 +127,19 @@ func action(c *cli.Context) error {
 
 	// websocket
 	ec.GET("/ws/fileio", func(c echo.Context) error {
-		serveWs(hub, c.Response(), c.Request())
+		serveWs(fileIOhub, c.Response(), c.Request())
+		return nil
+	})
+	ec.GET("/ws/cpu", func(c echo.Context) error {
+		serveWs(cpuUsedHub, c.Response(), c.Request())
+		return nil
+	})
+	ec.GET("/ws/memory", func(c echo.Context) error {
+		serveWs(memoryHub, c.Response(), c.Request())
+		return nil
+	})
+	ec.GET("/ws/bufferCache", func(c echo.Context) error {
+		serveWs(bufferCacheHub, c.Response(), c.Request())
 		return nil
 	})
 
@@ -125,6 +147,8 @@ func action(c *cli.Context) error {
 	ec.GET("/api/instance", handleInstance)
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 	ec.GET("/api/cpuUsed", handleCpuUsed)
+	ec.GET("/api/memory", handleMemory)
+	ec.GET("/api/bufferCache", handleBufferCache)
 	ec.GET("/api/errorlogs", handleErrorLogs)
 
 	ec.HideBanner = true

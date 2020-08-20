@@ -52,6 +52,34 @@ func handleCpuUsed(c echo.Context) error {
 	return c.JSON(http.StatusOK, cpu)
 }
 
+func handleMemory(c echo.Context) error {
+	con := db.NewConn(database, instance, sqlserver, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		return err
+	}
+	memory, err := db.GetMemory(d)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return c.JSON(http.StatusOK, memory)
+}
+
+func handleBufferCache(c echo.Context) error {
+	con := db.NewConn(database, instance, sqlserver, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		return err
+	}
+	bc, err := db.GetBufferCacheRate(d)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return c.JSON(http.StatusOK, bc)
+}
+
 func handleErrorLogs(c echo.Context) error {
 	con := db.NewConn(database, instance, sqlserver, user, password)
 	d, err := sql.Open("sqlserver", con.Connectionstring())

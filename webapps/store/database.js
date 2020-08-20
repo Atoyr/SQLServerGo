@@ -1,4 +1,57 @@
 import axios from 'axios'
+import { w3cwebsocket } from 'websocket';
+const W3CWebSocket = w3cwebsocket
+
+const fileIOWebsocketPlugin = (store) => {
+    var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/fileio`)
+    ws.onmessage = (e) => {
+      if (typeof e.data === 'string') {
+        let data = JSON.parse(event.data);
+        if (data.length > 0){
+          this.labels.push( Date.parse(data[0].datetime));
+        }
+        for(const f of data){
+          let id = (f.id - 1) * 2;
+
+          this.datasets[id].data.push({
+            x: Date.parse(f.datetime),
+            y: f.read_bytes_per_sec,
+          });
+          this.datasets[id + 1].data.push({
+            x: Date.parse(f.datetime),
+            y: f.read_bytes_per_sec,
+          });
+
+          if (this.datasets[id].data.length > 120) {
+            this.datasets[id].data.pop();
+          }
+          if (this.datasets[id + 1].data.length > 120) {
+            this.datasets[id + 1].data.pop();
+          }
+        }
+        if (this.labels.length > 120) {
+          this.labels.pop();
+        }
+      }
+    }
+}
+
+const cpuWebsocketPlugin = (store) => {
+  console.log("fooo")
+    var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/cpu`)
+    ws.onmessage = (e) => {
+      if (typeof e.data === 'string'){
+        let data = JSON.parse(event.data);
+        console.log(`cpu plugin ${data}`)
+      }
+    }
+}
+
+export const plugins = [
+  fileIOWebsocketPlugin,
+  cpuWebsocketPlugin
+]
+
 
 export const state = () => ({
   serverProperty: {
@@ -14,6 +67,13 @@ export const state = () => ({
   databaseFiles: [],
   fileInputIO: [],
   fileOutputIO: [],
+  cpu: {
+    id: "",
+    systemIdle: "",
+    sqlProcessUtilization: "",
+    otherProcessUtilization: "",
+    timestamp:""
+  },
 })
 
 export const mutations = {
@@ -26,6 +86,9 @@ export const mutations = {
     state.serverProperty.version = props.serverProperty.version;
     state.serverProperty.edition = props.serverProperty.edition;
     state.serverProperty.productLevel = props.serverProperty.productLevel;
+  },
+  updateFileIO({index,time,input,output}){
+
   }
 }
 
@@ -40,6 +103,13 @@ export const actions = {
     await axios.get(`http://${this.$getHost()}/api/instance`)
     .then((res) => {
       commit('updateServerProperty',{serverProperty:res.data});
+    })
+  },
+  async fetchDatabaseFiles({commit}) {
+    await axios.get(`http://${this.$getHost()}/api/databaseFiles`)
+    .then((res) => {
+      console.log(res.data)
+      //commit('updateServerProperty',{serverProperty:res.data});
     })
   }
 }

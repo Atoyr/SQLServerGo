@@ -1,14 +1,27 @@
 <template>
-  <v-col cols=12 :md="size" >
-    <v-card 
-      class="px-4 py-2" 
-      dark>
-      <v-card-title >
-       Read
-      </v-card-title>
-        <line-chart :chart-data="chartData" :options="chartOptions" :height="75 * size" /> 
-    </v-card>
-  </v-col>
+  <v-card 
+    class="py-2" 
+    dark>
+    <h1 class="label">
+     File Read bytes/sec
+    </h1>
+    <div class="px-4">
+      <line-chart :chart-data="chartData" :options="chartOptions" height=300 /> 
+    </div>
+    <div class="file-io-table px-4">
+      <div class="file-name">
+        <p v-for="fileName in files">
+        {{fileName}}
+        </p>
+      </div>
+      <div class="file-io">
+        <p v-for="readValue in readValues">
+        {{readValue}} bytes/sec
+        </p>
+      </div>
+    </div>
+
+  </v-card>
 </template>
 
 <script>
@@ -34,7 +47,7 @@ export default {
         labels: labels,
         datasets: datasets,
       }
-    }
+    },
   },
   props: {
     size: Number
@@ -49,7 +62,7 @@ export default {
 
           this.datasets.push(
             {
-              label: f.file_name + "_input",
+              label: f.file_name,
               fill: false,
               pointRadius: 0,
               borderWidth:2,
@@ -57,16 +70,7 @@ export default {
               data: []
             }
           )
-          this.datasets.push(
-            {
-              label: f.file_name + "_output",
-              fill: false,
-              pointRadius: 0,
-              borderWidth:2,
-              lineTension:0,
-              data: []
-            }
-          )
+          this.files.push(f.file_name);
         }
       })
 
@@ -77,14 +81,11 @@ export default {
         if (data.length > 0){
           this.labels.push( Date.parse(data[0].datetime));
         }
+        this.readValues.length=0;
         for(const f of data){
-          let id = (f.id - 1) * 2;
+          let id = f.id -1
 
           this.datasets[id].data.push({
-            x: Date.parse(f.datetime),
-            y: f.read_bytes_per_sec,
-          });
-          this.datasets[id + 1].data.push({
             x: Date.parse(f.datetime),
             y: f.read_bytes_per_sec,
           });
@@ -92,9 +93,7 @@ export default {
           if (this.datasets[id].data.length > 120) {
             this.datasets[id].data.pop();
           }
-          if (this.datasets[id + 1].data.length > 120) {
-            this.datasets[id + 1].data.pop();
-          }
+          this.readValues.push(f.read_bytes_per_sec);
         }
         if (this.labels.length > 120) {
           this.labels.pop();
@@ -102,6 +101,11 @@ export default {
       }
     }
 
+//     var cpuws = new W3CWebSocket(`ws://${this.$getHost()}/ws/cpu`)
+//     cpuws.onmessage = (e) => {
+//       console.log(e.data)
+//     }
+ 
     this.refresh = true
 
   }, 
@@ -159,8 +163,25 @@ export default {
       },
       labels: [],
       datasets: [],
+      files: [],
+      readValues: [],
       refresh: false,
     }
   }
 }
 </script>
+
+<style lang="scss">
+.file-io-table{
+  display:flex;
+  p{
+    margin-bottom: 2px;
+  }
+}
+.file-name{
+  width:75%;
+}
+.file-io{
+  width:25%;
+}
+</style>
