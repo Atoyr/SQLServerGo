@@ -37,7 +37,6 @@ const fileIOWebsocketPlugin = (store) => {
 }
 
 const cpuWebsocketPlugin = (store) => {
-  console.log("fooo")
     var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/cpu`)
     ws.onmessage = (e) => {
       if (typeof e.data === 'string'){
@@ -95,6 +94,9 @@ export const mutations = {
 export const getters = {
   InstanceName (state) {
     return state.serverProperty.instanceName;
+  },
+  ServerName (state) {
+    return state.serverProperty.serverName;
   }
 }
 

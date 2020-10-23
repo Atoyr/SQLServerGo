@@ -1,6 +1,6 @@
 <template>
-  <v-app dark>
-    <h1 class="left-label">{{InstanceName}}</h1>
+  <v-app dark :style="{background: $vuetify.theme.themes['dark'].background}">
+    <h1 class="left-label">{{ServerName}}</h1>
       <nuxt />
   </v-app>
 </template>
@@ -16,7 +16,7 @@ export default {
     }
   },
   computed: {
-      ...mapGetters('database',["InstanceName"])
+      ...mapGetters('database',["ServerName"])
     },
 }
 </script>

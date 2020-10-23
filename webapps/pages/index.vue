@@ -1,14 +1,14 @@
 <template>
   <div class="px-2 py-2">
     <v-row>
-      <v-col md=4>
-        <CpuUseGaugeCard class="px-2"></CpuUseGaugeCard>
+      <v-col md=1>
+        <CpuUseGaugeCard ></CpuUseGaugeCard>
       </v-col>
-      <v-col md=4>
-        <MemoryUseGaugeCard class="px-2"></MemoryUseGaugeCard>
+      <v-col md=1>
+        <MemoryUseGaugeCard ></MemoryUseGaugeCard>
       </v-col>
-      <v-col md=4>
-        <BufferCacheRateGaugeCard class="px-2"></BufferCacheRateGaugeCard>
+      <v-col md=1>
+        <BufferCacheRateGaugeCard ></BufferCacheRateGaugeCard>
       </v-col>
     </v-row>
     <v-row>
@@ -30,6 +30,7 @@ import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
 import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
 import Gauge from '@/components/Gauge.vue'
 import axios from 'axios'
+import { mapGetters} from 'vuex'
 
 export default {
   components: {
@@ -40,11 +41,19 @@ export default {
     FileReadIOCard,
     FileWriteIOCard
   },
+  computed: {
+      ...mapGetters('database',["ServerName"])
+    },
    async fetch ({ store, params }) {
      console.log("fetch")
      await store.dispatch('database/fetchServerProperty');
      await store.dispatch('database/fetchDatabaseFiles');
    },
+  head() {
+    return {
+      title: this.ServerName
+    }
+  }
 }
 </script>
 <style lang="scss">

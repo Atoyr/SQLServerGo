@@ -1,19 +1,13 @@
 <template>
   <v-card 
-    class="py-2" 
+    color="primary"
     dark>
-    <h1 class="label">
-     Memory (%)
-    </h1>
-    <div class="flex">
-      <Gauge :value="MemoryUseValue" size="300" stroke-width="16" caution-value="80" warning-value="90" unit="%" />
-      <div class="flex-col px-2">
-        <h2 class="memory-use-label">Physical Memory</h2>
-        <h3 class="py-2">{{this.physicalMemory}} MB</h3>
-        <h2 class="memory-use-label">Used Memory</h2>
-        <h3 class="py-2">{{this.usedMemory}} MB</h3>
-      </div>
-    </div>
+    <v-card-title class="title accent py-1">
+     Memory
+    </v-card-title>
+    <v-card-text class="py-2">
+      <Gauge :value="MemoryUseValue" size="100" stroke-width="8" caution-value="80" warning-value="90" unit="%" />
+    </v-card-text>
   </v-card>
 </template>
 

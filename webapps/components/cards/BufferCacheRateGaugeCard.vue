@@ -1,18 +1,15 @@
 <template>
   <v-card 
-    class="py-2" 
+    color="primary"
+    elevation="8"
     dark>
-    <h1 class="label">
-     Buffer Cache Hit Rate (%)
-    </h1>
-    <div class="flex">
-      <Gauge :value="Rate" size="300" stroke-width="16" caution-value="80" warning-value="90" unit="%" 
+    <v-card-title class="title accent py-1 ">
+     Cache
+    </v-card-title>
+    <v-card-text class="py-2">
+      <Gauge :value="Rate" size="100" stroke-width="8" caution-value="80" warning-value="90" unit="%" 
       :stroke-colors="strokeColors" :stroke-bg-colors="strokeBgColors"/>
-      <div class="flex-col px-2">
-        <h2 class="cpu-use-label">Buffer Cache Hit Rate</h2>
-        <h3 class="py-2">{{this.Rate}} %</h3>
-      </div>
-    </div>
+    </v-card-text>
   </v-card>
 </template>
 

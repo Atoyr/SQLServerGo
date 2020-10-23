@@ -1,19 +1,13 @@
 <template>
   <v-card 
-    class="py-2" 
+    color="primary"
     dark>
-    <h1 class="label">
-     CPU (%)
-    </h1>
-    <div class="flex">
-      <Gauge :value="CpuUseValue" size="300" stroke-width="16" caution-value="80" warning-value="90" unit="%" />
-      <div class="flex-col px-2">
-        <h2 class="cpu-use-label">sqlserer use</h2>
-        <h3 class="py-2">{{this.sqlUseValue}} %</h3>
-        <h2 class="cpu-use-label">other use</h2>
-        <h3 class="py-2">{{this.otherUseValue}} %</h3>
-      </div>
-    </div>
+    <v-card-title class="title accent py-1">
+     CPU
+    </v-card-title>
+    <v-card-text class="py-2">
+      <Gauge :value="CpuUseValue" size="100" stroke-width="8" caution-value="80" warning-value="90" unit="%" />
+    </v-card-text>
   </v-card>
 </template>
 

@@ -1,10 +1,10 @@
 <template>
   <v-card 
-    class="py-2" 
+    color="primary"
     dark>
-    <h1 class="label">
+    <v-card-title class="title accent py-1">
      File Read bytes/sec
-    </h1>
+    </v-card-title>
     <div class="px-4">
       <line-chart :chart-data="chartData" :options="chartOptions" height=300 /> 
     </div>

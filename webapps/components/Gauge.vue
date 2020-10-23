@@ -213,7 +213,7 @@ export default {
       this.animate();
     },
     animate: function() {
-      if (!this.speedEaseoutPercent && this.isAnimating) {
+      if (isNaN(this.speedEaseoutPercent) && this.isAnimating) {
         this.isAnimating = false;
       }
       if (this.isAnimating) {
