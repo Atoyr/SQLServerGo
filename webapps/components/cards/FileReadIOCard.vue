@@ -100,14 +100,7 @@ export default {
         }
       }
     }
-
-//     var cpuws = new W3CWebSocket(`ws://${this.$getHost()}/ws/cpu`)
-//     cpuws.onmessage = (e) => {
-//       console.log(e.data)
-//     }
- 
     this.refresh = true
-
   }, 
   data() {
     return {

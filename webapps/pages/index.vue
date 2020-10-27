@@ -1,13 +1,13 @@
 <template>
   <div class="px-2 py-2">
     <v-row>
-      <v-col md=1>
+      <v-col md=2>
         <CpuUseGaugeCard ></CpuUseGaugeCard>
       </v-col>
-      <v-col md=1>
+      <v-col md=2>
         <MemoryUseGaugeCard ></MemoryUseGaugeCard>
       </v-col>
-      <v-col md=1>
+      <v-col md=2>
         <BufferCacheRateGaugeCard ></BufferCacheRateGaugeCard>
       </v-col>
     </v-row>
@@ -34,7 +34,6 @@ import { mapGetters} from 'vuex'
 
 export default {
   components: {
-    Gauge,
     MemoryUseGaugeCard,
     CpuUseGaugeCard,
     BufferCacheRateGaugeCard,

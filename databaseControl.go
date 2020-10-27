@@ -1,117 +1,44 @@
 package main
 
 import (
-	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"log"
-	"os"
-	"time"
 
 	db "github.com/atoyr/SQLServerGo/database"
 )
 
-func getDatabaseFileIO(ctx context.Context, h *Hub) {
-	d, err := sql.Open("sqlserver", connectionstring())
-	if err != nil {
-		log.Println(err)
-		// TODO CONTEXT end
-		os.Exit(1)
-	}
-	defer d.Close()
-
-	t := time.NewTicker(time.Duration(tickRate) * time.Second)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-t.C:
-			ios, err := db.GetDatabaseFileIOs(d)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				data, _ := json.Marshal(ios)
-				h.broadcast <- data
-			}
-		}
-	}
+func publishDatabaseFileIO(d *sql.DB){
+  ios, err := db.GetDatabaseFileIOs(d)
+  if err != nil {
+    fmt.Println(err)
+  } else {
+    ps.Pub(ios)
+  }
 }
 
-func getCpuUsed(ctx context.Context, h *Hub) {
-	d, err := sql.Open("sqlserver", connectionstring())
-	if err != nil {
-		log.Println(err)
-		// TODO CONTEXT end
-		os.Exit(1)
-	}
-	defer d.Close()
-
-	t := time.NewTicker(time.Duration(tickRate) * time.Second)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-t.C:
-			cu, err := db.GetCpuUsed(d)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				data, _ := json.Marshal(cu)
-				h.broadcast <- data
-			}
-		}
-	}
+func publishCpuUsed(d *sql.DB){
+  cu, err := db.GetCpuUsed(d)
+  if err != nil {
+    fmt.Println(err)
+  } else {
+    ps.Pub(cu)
+  }
 }
 
-func getMemory(ctx context.Context, h *Hub) {
-	d, err := sql.Open("sqlserver", connectionstring())
-	if err != nil {
-		log.Println(err)
-		// TODO CONTEXT end
-		os.Exit(1)
-	}
-	defer d.Close()
-
-	t := time.NewTicker(time.Duration(tickRate) * time.Second)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-t.C:
-			cu, err := db.GetMemory(d)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				data, _ := json.Marshal(cu)
-				h.broadcast <- data
-			}
-		}
-	}
+func publishMemory(d *sql.DB){
+  m, err := db.GetMemory(d)
+  if err != nil {
+    fmt.Println(err)
+  } else {
+    ps.Pub(m)
+  }
 }
 
-func getBufferCache(ctx context.Context, h *Hub) {
-	d, err := sql.Open("sqlserver", connectionstring())
-	if err != nil {
-		log.Println(err)
-		// TODO CONTEXT end
-		os.Exit(1)
-	}
-	defer d.Close()
-
-	t := time.NewTicker(time.Duration(tickRate) * time.Second)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-t.C:
-			cu, err := db.GetBufferCacheRate(d)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				data, _ := json.Marshal(cu)
-				h.broadcast <- data
-			}
-		}
-	}
+func publishBufferCache(d *sql.DB){
+  bc, err := db.GetBufferCacheRate(d)
+  if err != nil {
+    fmt.Println(err)
+  } else {
+    ps.Pub(bc)
+  }
 }

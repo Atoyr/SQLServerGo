@@ -10,7 +10,14 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+  "time"
 	"os"
+	"encoding/json"
+	"encoding/csv"
+  "reflect"
+  "strconv"
+  "log"
+	"path/filepath"
 
 	_ "github.com/denisenkom/go-mssqldb"
 
@@ -18,16 +25,26 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/urfave/cli/v2"
+  "github.com/mattn/go-pubsub"
+	db "github.com/atoyr/SQLServerGo/database"
 )
 
+// SQL DB Information
 var sqlserver string
 var instance string
 var user string
 var password string
 var database string
 
+// Web
 var webport int
 var tickRate int64
+
+// Publisher/Subscriber
+var ps = pubsub.New()
+
+// Time Layout
+var layout = "2006-01-02 15:04:05"
 
 func main() {
 	app := new(cli.App)
@@ -100,24 +117,86 @@ func main() {
 }
 
 func action(c *cli.Context) error {
-	err := tryDatabaseConnect()
+  // config setting
+  appPath, err := createConfigDirectoryIfNotExists("sqlServerGo")
+  if err != nil {
+    log.Fatal(err)
+  }
+  dbFileName := fmt.Sprintf("%s__%s__data.db", sqlserver, instance)
+	dbFile := filepath.Join(appPath, dbFileName)
+  bolt, err := openDB(dbFile)
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer bolt.Close()
+
+  // Check SQL DB Exists
+	err = tryDatabaseConnect()
 	if err != nil {
 		return err
 	}
-	fileIOhub := newHub()
+
+  // create db connection
+	d, err := sql.Open("sqlserver", connectionstring())
+	if err != nil {
+    log.Fatal(err)
+	}
+	defer d.Close()
+
+  // create and run websocket hub
+	fileIOHub := newHub()
 	cpuUsedHub := newHub()
 	memoryHub := newHub()
 	bufferCacheHub := newHub()
-	go fileIOhub.run()
+	go fileIOHub.run()
 	go cpuUsedHub.run()
 	go memoryHub.run()
 	go bufferCacheHub.run()
 
+  // register subscribe
+  ps.Sub(func(dbFileIO []db.DatabaseFileIO) {
+    t := time.Now()
+    data, _ := json.Marshal(dbFileIO)
+    fileIOHub.broadcast <- data
+    update(bolt, "databaseFileIO", []byte(t.Format(time.RFC3339)), []byte(data))
+  })
+  ps.Sub(func(cpu db.Cpu) {
+    t := time.Now()
+    data, _ := json.Marshal(cpu)
+    cpuUsedHub.broadcast <- data
+    update(bolt, "cpuUsed", []byte(t.Format(time.RFC3339)), []byte(data))
+  })
+  ps.Sub(func(memory db.Memory) {
+    t := time.Now()
+    data, _ := json.Marshal(memory)
+    memoryHub.broadcast <- data
+    update(bolt, "memory", []byte(t.Format(time.RFC3339)), []byte(data))
+  })
+  ps.Sub(func(bufferCache db.BufferCache) {
+    t := time.Now()
+    data, _ := json.Marshal(bufferCache)
+    bufferCacheHub.broadcast <- data
+    update(bolt, "bufferCache", []byte(t.Format(time.RFC3339)), []byte(data))
+  })
+
+
 	back := context.Background()
-	go getDatabaseFileIO(back, fileIOhub)
-	go getCpuUsed(back, cpuUsedHub)
-	go getMemory(back, memoryHub)
-	go getBufferCache(back, bufferCacheHub)
+  //tickerCtx, _ := context.WithCancel(back)
+  go func(c context.Context){
+    t := time.NewTicker(time.Duration(tickRate) * time.Second)
+    for {
+      select {
+      case <-c.Done():
+        return
+      case <-t.C:
+        publishDatabaseFileIO(d)
+        publishCpuUsed(d)
+        publishMemory(d)
+        publishBufferCache(d)
+      }
+    }
+  }(back)
+
 	ec := echo.New()
 	ec.Use(middleware.CORS())
 
@@ -127,7 +206,7 @@ func action(c *cli.Context) error {
 
 	// websocket
 	ec.GET("/ws/fileio", func(c echo.Context) error {
-		serveWs(fileIOhub, c.Response(), c.Request())
+		serveWs(fileIOHub, c.Response(), c.Request())
 		return nil
 	})
 	ec.GET("/ws/cpu", func(c echo.Context) error {
@@ -145,6 +224,7 @@ func action(c *cli.Context) error {
 
 	// webapi
 	ec.GET("/api/instance", handleInstance)
+	ec.GET("/api/serverStatus", handleServerStatus)
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 	ec.GET("/api/cpuUsed", handleCpuUsed)
 	ec.GET("/api/memory", handleMemory)
@@ -222,4 +302,64 @@ func check() (error, bool) {
 		return err, false
 	}
 	return nil, true
+}
+
+func writeCsv(path string, target interface{}) error{
+  file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0600)
+  if err != nil {
+    return err
+  }
+  defer file.Close()
+
+  writer := csv.NewWriter(file)
+  writer.Write(createCSV(target))
+  writer.Flush()
+  return nil
+}
+
+func createCSVHeader(target interface{}) []string {
+  rv := reflect.ValueOf(target)
+  rt := rv.Type()
+  ret := make([]string,rt.NumField())
+
+  for i := 0; i < rt.NumField(); i++{
+    f := rt.Field(i)
+    ret[i] = f.Name
+  }
+  return ret
+}
+
+func createCSV(target interface{}) []string {
+  rv := reflect.ValueOf(target)
+  rt := rv.Type()
+  ret := make([]string,rt.NumField())
+
+  for i := 0; i < rt.NumField(); i++{
+    f := rv.Field(i)
+    switch f.Interface().(type) {
+      case string:
+        if v, ok := f.Interface().(string); ok {
+          ret[i] = v
+        } else {
+          ret[i] = ""
+        }
+      case int:
+      case int32:
+      case int64:
+        if v, ok := f.Interface().(int64); ok {
+          ret[i] = strconv.FormatInt(v,10)
+        } else {
+          ret[i] = ""
+        }
+      case time.Time:
+        if v, ok := f.Interface().(time.Time); ok {
+          ret[i] = v.Format(layout)
+        } else {
+          ret[i] = ""
+        }
+      default :
+        ret[i] = ""
+    }
+  }
+  return ret
 }
