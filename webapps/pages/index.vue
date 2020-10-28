@@ -2,7 +2,7 @@
   <div class="px-2 py-2">
     <v-row>
       <v-col md=3>
-        <Uptime ></Uptime>
+        <UptimeCard ></UptimeCard>
       </v-col>
       <v-col md=2>
         <CpuUseGaugeCard ></CpuUseGaugeCard>
@@ -31,7 +31,7 @@
 import CpuUseGaugeCard from '@/components/cards/CpuUseGaugeCard.vue'
 import MemoryUseGaugeCard from '@/components/cards/MemoryUseGaugeCard.vue'
 import BufferCacheRateGaugeCard from '@/components/cards/BufferCacheRateGaugeCard.vue'
-import Uptime from '@/components/cards/Uptime.vue'
+import UptimeCard from '@/components/cards/UptimeCard.vue'
 import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
 import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
 import Gauge from '@/components/Gauge.vue'
@@ -43,7 +43,7 @@ export default {
     MemoryUseGaugeCard,
     CpuUseGaugeCard,
     BufferCacheRateGaugeCard,
-    Uptime,
+    UptimeCard,
     FileReadIOCard,
     FileWriteIOCard
   },
