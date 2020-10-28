@@ -1,6 +1,7 @@
 <template>
   <v-card 
     color="primary"
+    elevation="8"
     dark>
     <v-card-title class="title accent py-1">
      CPU
