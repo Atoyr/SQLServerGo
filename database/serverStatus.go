@@ -7,7 +7,7 @@ import (
 )
 
 type ServerStatus struct {
-	InstanceStartTime   time.Time `json:"InstanceStartTime"`
+	InstanceStartTime   time.Time `json:"instance_start_time"`
 }
 
 const ServerStatusQuery string = `
