@@ -1,20 +1,23 @@
 <template>
   <div class="px-2 py-2">
     <v-row>
-      <v-col md=3>
+      <v-col sm=12 md=3>
         <UptimeCard ></UptimeCard>
       </v-col>
-      <v-col md=2>
+      <v-col sm=4 md=2>
         <CpuUseGaugeCard ></CpuUseGaugeCard>
       </v-col>
-      <v-col md=2>
+      <v-col sm=4 md=2>
         <MemoryUseGaugeCard ></MemoryUseGaugeCard>
       </v-col>
-      <v-col md=2>
+      <v-col sm=4 md=2>
         <BufferCacheRateGaugeCard ></BufferCacheRateGaugeCard>
       </v-col>
     </v-row>
     <v-row>
+      <v-col md=6>
+        <testChart></testChart>
+      </v-col>
       <!--
       <v-col md=6>
         <FileReadIOCard></FileReadIOCard>
@@ -34,6 +37,7 @@ import BufferCacheRateGaugeCard from '@/components/cards/BufferCacheRateGaugeCar
 import UptimeCard from '@/components/cards/UptimeCard.vue'
 import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
 import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
+import testChart from '@/components/cards/testChart.vue'
 import Gauge from '@/components/Gauge.vue'
 import axios from 'axios'
 import { mapGetters} from 'vuex'
@@ -45,7 +49,8 @@ export default {
     BufferCacheRateGaugeCard,
     UptimeCard,
     FileReadIOCard,
-    FileWriteIOCard
+    FileWriteIOCard,
+    testChart
   },
   computed: {
       ...mapGetters('database',["ServerName"])
