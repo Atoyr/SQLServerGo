@@ -8,7 +8,7 @@
     </v-card-title>
     <v-card-text class="py-2">
       <v-layout justify-center>
-      <Gauge :value="Rate" size="100" stroke-width="8" caution-value="80" warning-value="90" unit="%" 
+      <Gauge :value="Rate" size="100" stroke-width="8" caution-value=80 warning-value=90 unit="%" 
       :stroke-colors="strokeColors" :stroke-bg-colors="strokeBgColors"/>
       </v-layout>
     </v-card-text>

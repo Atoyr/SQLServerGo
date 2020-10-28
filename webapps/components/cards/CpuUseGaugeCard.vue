@@ -7,7 +7,7 @@
     </v-card-title>
     <v-card-text class="py-2" id="cpu-gauge-card">
       <v-layout justify-center>
-        <Gauge :value="CpuUseValue" size="100" stroke-width="8" caution-value="80" warning-value="90" unit="%" />
+        <Gauge :value="CpuUseValue" size="100" stroke-width="8" caution-value=80 warning-value=90 unit="%" />
       </v-layout>
     </v-card-text>
   </v-card>
