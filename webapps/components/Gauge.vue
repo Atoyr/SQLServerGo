@@ -72,27 +72,21 @@
 export default {
   props:{
     value:{
-      type: Number,
       default: 0
     },
     minValue: {
-      type: Number,
       default: 0
     },
     maxValue: {
-      type: Number,
       default: 100
     },
     cautionValue: {
-      type: Number,
       default: 101
     },
     warningValue: {
-      type: Number,
       default: 101
     },
     strokeWidth: {
-      type: Number,
       default: 50
     },
     strokeColors: {
@@ -104,15 +98,12 @@ export default {
       default: () => ['#ccffcc','#ffd8b2','#ffcccc']
     },
     size: {
-      type: Number,
       default: 500
     },
     fontSize: {
-      type: Number,
       default: 128
     },
     unit: {
-      type: String,
       default: ''
     }
   },
