@@ -73,6 +73,9 @@ export const state = () => ({
     otherProcessUtilization: "",
     timestamp:""
   },
+  serverStatus: {
+    startTime: new Date()
+  }
 })
 
 export const mutations = {
@@ -87,7 +90,9 @@ export const mutations = {
     state.serverProperty.productLevel = props.serverProperty.productLevel;
   },
   updateFileIO({index,time,input,output}){
-
+  },
+  updateServerStatus(state, props) {
+    state.serverStatus.startTime = new Date(props.serverStatus.instance_start_time);
   }
 }
 
@@ -97,6 +102,9 @@ export const getters = {
   },
   ServerName (state) {
     return state.serverProperty.serverName;
+  },
+  StartTime (state) {
+    return state.serverStatus.startTime;
   }
 }
 
@@ -104,12 +112,22 @@ export const actions = {
   async fetchServerProperty ({commit}) {
     await axios.get(`http://${this.$getHost()}/api/instance`)
     .then((res) => {
+      console.log(res.data)
       commit('updateServerProperty',{serverProperty:res.data});
     })
   },
   async fetchDatabaseFiles({commit}) {
     await axios.get(`http://${this.$getHost()}/api/databaseFiles`)
     .then((res) => {
+      console.log(res.data)
+      //commit('updateServerProperty',{serverProperty:res.data});
+    })
+  },
+  async fetchServerStatus({commit}) {
+    await axios.get(`http://${this.$getHost()}/api/serverStatus`)
+    .then((res) => {
+      commit('updateServerStatus',{serverStatus:res.data})
+      // instance_start_time
       console.log(res.data)
       //commit('updateServerProperty',{serverProperty:res.data});
     })
