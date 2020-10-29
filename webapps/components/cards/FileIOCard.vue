@@ -3,7 +3,7 @@
     color="primary"
     dark>
     <v-card-title class="title accent py-1">
-     File Read bytes/sec
+      {{this.database}} File {{this.write?'write':'read'}} MiB/sec
     </v-card-title>
     <v-card-text>
       <v-container class="px-1 py-1">
@@ -25,11 +25,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import { w3cwebsocket } from 'websocket';
 import { GChart } from 'vue-google-charts';
-const W3CWebSocket = w3cwebsocket
-const datalength = 300
+import { mapGetters } from 'vuex';
 
 export default {
   components: {
@@ -38,61 +35,45 @@ export default {
   methods: {
   },
   computed: {
+    ...mapGetters('database',["Instance"]),
     chartData: function() {
       return this.header.concat(this.dtil);
     }
   },
-  props: {
-    size: Number,
-    read: {
-      default: true
-    }
-  },
-  mounted() {
-    fetch(`http://${this.$getHost()}/api/databaseFiles`)
-      .then(response => {
-        return response.json();
-      })
-      .then(res => {
-        let header = ["datetime"]
-        for(const f of res){
-          header.push(f.file_name)
-        }
-        this.header = [header]
-        console.log(this.header)
-      })
-
-    var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/fileio`)
-    ws.onmessage = (e) => {
-      if (typeof e.data === 'string') {
-        let data = JSON.parse(event.data);
-        let dtil = []
-        if (data.length > 0){
-          dtil.push( data[0].datetime);
-        }
-        for(const f of data){
-          if (this.read) {
-            dtil.push(f.read_bytes_per_sec);
-          } else {
-            dtil.push(f.write_bytes_per_sec);
-          }
-        }
-        this.dtil.push(dtil);
-        if (this.dtil.length > 60) {
-          this.dtil.shift();
+  created() {
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'database/updateInstance') {
+        let instance = state.database.instance
+        if (this.database in instance){
+          let h = instance[this.database].files.concat();
+          h.unshift("datetime");
+          this.header = [h];
+          let d = this.write ? instance[this.database].write: instance[this.database].read;
+          this.dtil = d.concat();
         }
       }
-    }
+    });
+  },
+  beforeDestroy() {
+    this.unsubscribe();
+  },
+  props: {
+    size: Number,
+    database: {
+      default: 'master'
+    },
+    write: Boolean
+  },
+  mounted() {
   }, 
   data() {
     return {
       header: [],
-      dtil: [],
+      dtil : [],
       chartOptions: {
-        title: this.read ? 'read' : 'write',
+        title: this.write ? 'write' : 'read',
         colors: ["#AEC7E8","#FFBB78","#98E28A","#FF9896","#C5B0D5","#C49C94"],
         hAxis: {
-          textPosition: 'none'
         },
         vAxis: {
           minValue: 100,
@@ -129,4 +110,5 @@ export default {
   width:25%;
 }
 </style>
+
 

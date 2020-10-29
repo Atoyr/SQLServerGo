@@ -9,7 +9,7 @@
     <v-card-text class="py-2 d-flex align-center" style="min-height:123px">
       <v-layout justify-center>
         <h2>
-        {{day}} day {{hour | zeroPadding}} : {{minute | zeroPadding}} : {{second | zeroPadding}}
+        {{day}} : {{hour | zeroPadding}} : {{minute | zeroPadding}} : {{second | zeroPadding}}
         </h2>
       </v-layout>
     </v-card-text>

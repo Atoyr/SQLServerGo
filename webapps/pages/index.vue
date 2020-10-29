@@ -16,7 +16,10 @@
     </v-row>
     <v-row>
       <v-col md=6>
-        <testChart></testChart>
+        <FileIOCard database="R_1_1_0_FI" ></FileIOCard>
+      </v-col>
+      <v-col md=6>
+        <FileIOCard database="R_1_1_0_FI" write></FileIOCard>
       </v-col>
       <!--
       <v-col md=6>
@@ -38,6 +41,7 @@ import UptimeCard from '@/components/cards/UptimeCard.vue'
 import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
 import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
 import testChart from '@/components/cards/testChart.vue'
+import FileIOCard from '@/components/cards/FileIOCard.vue'
 import Gauge from '@/components/Gauge.vue'
 import { mapGetters} from 'vuex'
 import { w3cwebsocket } from 'websocket';
@@ -52,6 +56,7 @@ export default {
     UptimeCard,
     FileReadIOCard,
     FileWriteIOCard,
+    FileIOCard,
     testChart
   },
   mounted() {
