@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 py-2">
+  <v-container class="px-1 py-1">
     <v-row>
       <v-col sm=12 md=3>
         <UptimeCard ></UptimeCard>
@@ -27,7 +27,7 @@
       </v-col>
       -->
     </v-row>
-  </div>
+  </v-container>
 </template>
 
 <script>
