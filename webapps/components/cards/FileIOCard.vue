@@ -8,15 +8,35 @@
     <v-card-text>
       <v-container class="px-1 py-1">
         <v-row>
-          <v-col md=9>
+          <v-col md=8>
             <GChart
               type="LineChart"
               :data="chartData"
               :options="chartOptions"
               />
           </v-col>         
-          <v-col md=3>
-
+          <v-col md=4>
+            <v-simple-table class="primary" dark>
+                <thead>
+                  <tr>
+                    <th class="text-left">
+                      fileName
+                    </th>
+                    <th class="text-left">
+                      MiB/sec
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="item in tableData"
+                    :key="item.name"
+                  >
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.io }} MiB/sec</td>
+                  </tr>
+                </tbody>
+            </v-simple-table>
           </v-col>
         </v-row>
       </v-container>
@@ -38,7 +58,7 @@ export default {
     ...mapGetters('database',["Instance"]),
     chartData: function() {
       return this.header.concat(this.dtil);
-    }
+    },
   },
   created() {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
@@ -51,6 +71,13 @@ export default {
           let d = this.write ? instance[this.database].write: instance[this.database].read;
           this.dtil = d.concat();
         }
+
+        let tdata = []
+        let index = this.dtil.length - 1
+        for(let i = 1; i < this.header[0].length; i++) {
+          tdata.push({name: this.header[0][i],io: this.dtil[index][i]})
+        }
+        this.tableData = tdata
       }
     });
   },
@@ -70,13 +97,14 @@ export default {
     return {
       header: [],
       dtil : [],
+      tableData : [],
       chartOptions: {
         title: this.write ? 'write' : 'read',
         colors: ["#AEC7E8","#FFBB78","#98E28A","#FF9896","#C5B0D5","#C49C94"],
         hAxis: {
         },
         vAxis: {
-          minValue: 100,
+          minValue: 10,
           textStyle: {
             color: '#eeeeee'
           }
