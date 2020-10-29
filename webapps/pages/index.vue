@@ -39,8 +39,10 @@ import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
 import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
 import testChart from '@/components/cards/testChart.vue'
 import Gauge from '@/components/Gauge.vue'
-import axios from 'axios'
 import { mapGetters} from 'vuex'
+import { w3cwebsocket } from 'websocket';
+const W3CWebSocket = w3cwebsocket
+const datalength = 300
 
 export default {
   components: {
@@ -52,6 +54,15 @@ export default {
     FileWriteIOCard,
     testChart
   },
+  mounted() {
+    var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/fileio`)
+    ws.onmessage = (e) => {
+      if (typeof e.data === 'string') {
+        let data = JSON.parse(event.data);
+        this.$store.commit('database/updateInstance',{data})
+      }
+    }
+  }, 
   computed: {
       ...mapGetters('database',["ServerName"])
     },

@@ -1,57 +1,4 @@
 import axios from 'axios'
-import { w3cwebsocket } from 'websocket';
-const W3CWebSocket = w3cwebsocket
-
-const fileIOWebsocketPlugin = (store) => {
-    var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/fileio`)
-    ws.onmessage = (e) => {
-      if (typeof e.data === 'string') {
-        let data = JSON.parse(event.data);
-        if (data.length > 0){
-          this.labels.push( Date.parse(data[0].datetime));
-        }
-        for(const f of data){
-          let id = (f.id - 1) * 2;
-
-          this.datasets[id].data.push({
-            x: Date.parse(f.datetime),
-            y: f.read_bytes_per_sec,
-          });
-          this.datasets[id + 1].data.push({
-            x: Date.parse(f.datetime),
-            y: f.read_bytes_per_sec,
-          });
-
-          if (this.datasets[id].data.length > 120) {
-            this.datasets[id].data.pop();
-          }
-          if (this.datasets[id + 1].data.length > 120) {
-            this.datasets[id + 1].data.pop();
-          }
-        }
-        if (this.labels.length > 120) {
-          this.labels.pop();
-        }
-      }
-    }
-}
-
-const cpuWebsocketPlugin = (store) => {
-    var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/cpu`)
-    ws.onmessage = (e) => {
-      if (typeof e.data === 'string'){
-        let data = JSON.parse(event.data);
-        console.log(`cpu plugin ${data}`)
-      }
-    }
-}
-
-export const plugins = [
-  fileIOWebsocketPlugin,
-  cpuWebsocketPlugin
-]
-
-
 export const state = () => ({
   serverProperty: {
     machineName: "",
@@ -63,9 +10,7 @@ export const state = () => ({
 	  edition: "",
 	  productLevel: ""
   },
-  databaseFiles: [],
-  fileInputIO: [],
-  fileOutputIO: [],
+  instance: {},
   cpu: {
     id: "",
     systemIdle: "",
@@ -89,7 +34,43 @@ export const mutations = {
     state.serverProperty.edition = props.serverProperty.edition;
     state.serverProperty.productLevel = props.serverProperty.productLevel;
   },
-  updateFileIO({index,time,input,output}){
+  updateInstance(state, props) {
+    let datetime = props.data[0].datetime;
+    let fileCount = 0;
+    let beforeDatabaseName = ""
+    for(const f of props.data){
+      if (beforeDatabaseName != f.database_name) {
+        fileCount = 0;
+        beforeDatabaseName = f.database_name;
+      }
+      if (f.database_name in state.instance){
+        if (state.instance[f.database_name].files.length <= fileCount ) {
+          state.instance[f.database_name].files.push(f.file_name)
+        }
+      }else {
+        state.instance[f.database_name] = {files:[f.file_name],read:[],write:[]}
+      }
+      fileCount++;
+    }
+
+    for(let key in state.instance) {
+      state.instance[key].read.push([datetime]);
+      state.instance[key].write.push([datetime]);
+    }
+    for(const f of props.data){
+      let index = state.instance[f.database_name].read.length - 1
+      state.instance[f.database_name].read[index].push(f.read_bytes_per_sec / 1048576)
+      state.instance[f.database_name].write[index].push(f.write_bytes_per_sec / 1048576)
+    }
+    
+    for(let key in state.instance) {
+      if (state.instance[key].read.length > 30) {
+        state.instance[key].read.shift();
+      }
+      if (state.instance[key].write.length > 30) {
+        state.instance[key].write.shift();
+      }
+    }
   },
   updateServerStatus(state, props) {
     state.serverStatus.startTime = new Date(props.serverStatus.instance_start_time);
@@ -97,6 +78,9 @@ export const mutations = {
 }
 
 export const getters = {
+  Instance (state) {
+    return state.instance;
+  },
   InstanceName (state) {
     return state.serverProperty.instanceName;
   },
@@ -120,16 +104,13 @@ export const actions = {
     await axios.get(`http://${this.$getHost()}/api/databaseFiles`)
     .then((res) => {
       console.log(res.data)
-      //commit('updateServerProperty',{serverProperty:res.data});
     })
   },
   async fetchServerStatus({commit}) {
     await axios.get(`http://${this.$getHost()}/api/serverStatus`)
     .then((res) => {
       commit('updateServerStatus',{serverStatus:res.data})
-      // instance_start_time
       console.log(res.data)
-      //commit('updateServerProperty',{serverProperty:res.data});
     })
   }
 }
