@@ -59,8 +59,8 @@ export const mutations = {
     }
     for(const f of props.data){
       let index = state.instance[f.database_name].read.length - 1
-      state.instance[f.database_name].read[index].push(f.read_bytes_per_sec / 1048576)
-      state.instance[f.database_name].write[index].push(f.write_bytes_per_sec / 1048576)
+      state.instance[f.database_name].read[index].push(f.read_bytes_per_sec / 1024)
+      state.instance[f.database_name].write[index].push(f.write_bytes_per_sec / 1024)
     }
     
     for(let key in state.instance) {

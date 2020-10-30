@@ -23,7 +23,7 @@
                       fileName
                     </th>
                     <th class="text-left">
-                      MiB/sec
+                      KiB/sec
                     </th>
                   </tr>
                 </thead>
@@ -33,7 +33,7 @@
                     :key="item.name"
                   >
                   <td>{{ item.name }}</td>
-                  <td>{{ item.io }} MiB/sec</td>
+                  <td>{{ item.io }} KiB/sec</td>
                   </tr>
                 </tbody>
             </v-simple-table>
@@ -104,7 +104,7 @@ export default {
         hAxis: {
         },
         vAxis: {
-          minValue: 10,
+          minValue: 100,
           textStyle: {
             color: '#eeeeee'
           }
