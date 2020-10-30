@@ -3,23 +3,26 @@ package database
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 // Database is SQLServer instrance database
 type Memory struct {
-	PhysicalMemory    int    `json:"physical_memory"`
-	UsedMemory        int    `json:"used_memory"`
-	AvailableMemory   int    `json:"available_memory"`
-	TotalPageFile     int    `json:"total_page_file"`
-	UsedPageFile      int    `json:"used_page_file"`
-	AvailablePageFile int    `json:"available_page_file"`
-	SystemChace       int    `json:"system_chace"`
-	SystemMemoryState string `json:"system_memory_state"`
+  Datetime          time.Time `json:"datetime"`
+	PhysicalMemory    int       `json:"physical_memory"`
+	UsedMemory        int       `json:"used_memory"`
+	AvailableMemory   int       `json:"available_memory"`
+	TotalPageFile     int       `json:"total_page_file"`
+	UsedPageFile      int       `json:"used_page_file"`
+	AvailablePageFile int       `json:"available_page_file"`
+	SystemChace       int       `json:"system_chace"`
+	SystemMemoryState string    `json:"system_memory_state"`
 }
 
 const MemoryInfoQuery string = `
   use master
   SELECT 
+    getdate() AS [Datetime],
     total_physical_memory_kb/1024 AS [Physical Memory (MB)], 
     available_physical_memory_kb/1024 AS [Available Memory (MB)], 
     total_page_file_kb/1024 AS [Total Page File (MB)], 
@@ -35,6 +38,7 @@ func GetMemory(dbcontext *sql.DB) (Memory, error) {
 
 	m := new(Memory)
 	if err := row.Scan(
+    &m.Datetime,
 		&m.PhysicalMemory,
 		&m.AvailableMemory,
 		&m.TotalPageFile,

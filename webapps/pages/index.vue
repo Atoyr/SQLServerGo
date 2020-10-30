@@ -11,6 +11,9 @@
         <MemoryUseGaugeCard ></MemoryUseGaugeCard>
       </v-col>
       <v-col sm=4 md=2 class="pa-1">
+        <MemoryUsedCard></MemoryUsedCard>
+      </v-col>
+      <v-col sm=4 md=2 class="pa-1">
         <BufferCacheRateGaugeCard ></BufferCacheRateGaugeCard>
       </v-col>
     </v-row>
@@ -36,6 +39,7 @@
 <script>
 import CpuUseGaugeCard from '@/components/cards/CpuUseGaugeCard.vue'
 import MemoryUseGaugeCard from '@/components/cards/MemoryUseGaugeCard.vue'
+import MemoryUsedCard from '@/components/cards/MemoryUsedCard.vue'
 import BufferCacheRateGaugeCard from '@/components/cards/BufferCacheRateGaugeCard.vue'
 import UptimeCard from '@/components/cards/UptimeCard.vue'
 import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
@@ -51,6 +55,7 @@ const datalength = 300
 export default {
   components: {
     MemoryUseGaugeCard,
+    MemoryUsedCard,
     CpuUseGaugeCard,
     BufferCacheRateGaugeCard,
     UptimeCard,
