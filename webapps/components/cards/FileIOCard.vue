@@ -104,7 +104,7 @@ export default {
       tableData : [],
       chartOptions: {
         // title: this.write ? 'write' : 'read',
-        colors: ["#AEC7E8","#FFBB78","#98E28A","#FF9896","#C5B0D5","#C49C94"],
+        colors: ["#FFBB78","#AEC7E8","#98E28A","#FF9896","#C5B0D5","#C49C94"],
         hAxis: {
           format: 'hh:mm:ss',
           textStyle: {
