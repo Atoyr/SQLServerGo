@@ -1,32 +1,32 @@
 <template>
-  <v-container class="px-1 py-1">
+  <v-container fluid class="px-4 py-1">
     <v-row>
-      <v-col sm=12 md=3 class="px-1 py-1">
+      <v-col sm=12 md=3 class="pa-1">
         <UptimeCard ></UptimeCard>
       </v-col>
-      <v-col sm=4 md=2 class="px-1 py-1">
+      <v-col sm=4 md=2 class="pa-1">
         <CpuUseGaugeCard ></CpuUseGaugeCard>
       </v-col>
-      <v-col sm=4 md=2 class="px-1 py-1">
+      <v-col sm=4 md=2 class="pa-1">
         <MemoryUseGaugeCard ></MemoryUseGaugeCard>
       </v-col>
-      <v-col sm=4 md=2 class="px-1 py-1">
+      <v-col sm=4 md=2 class="pa-1">
         <BufferCacheRateGaugeCard ></BufferCacheRateGaugeCard>
       </v-col>
     </v-row>
     <v-row>
-      <v-col md=6 class="px-1 py-1">
+      <v-col md=6 class="pa-1">
         <FileIOCard database="R_1_1_0_SC" ></FileIOCard>
       </v-col>
-      <v-col md=6 class="px-1 py-1">
+      <v-col md=6 class="pa-1">
         <FileIOCard database="R_1_1_0_SC" write></FileIOCard>
       </v-col>
     </v-row>
     <v-row>
-      <v-col md=6 class="px-1 py-1">
+      <v-col md=6 class="pa-1">
         <FileIOCard database="R_1_1_0_FI" ></FileIOCard>
       </v-col>
-      <v-col md=6 class="px-1 py-1">
+      <v-col md=6 class="pa-1">
         <FileIOCard database="R_1_1_0_FI" write></FileIOCard>
       </v-col>
     </v-row>

@@ -3,7 +3,7 @@
     color="primary"
     tile
     dark>
-    <v-card-title class="title accent py-1">
+    <v-card-title class="subtitle-1 accent py-0">
       {{this.database}} File {{this.write?'Write':'Read'}} KiB/sec
     </v-card-title>
     <v-card-text>
@@ -11,7 +11,7 @@
         <v-row>
           <v-col md=8>
             <GChart
-              type="LineChart"
+              type="AreaChart"
               :data="chartData"
               :options="chartOptions"
               />
@@ -100,7 +100,7 @@ export default {
       dtil : [],
       tableData : [],
       chartOptions: {
-        title: this.write ? 'write' : 'read',
+        // title: this.write ? 'write' : 'read',
         colors: ["#AEC7E8","#FFBB78","#98E28A","#FF9896","#C5B0D5","#C49C94"],
         hAxis: {
           format: 'hh:mm:ss',
@@ -120,6 +120,7 @@ export default {
         chartArea: {
           backgroundColor: '#293349',
           width: "90%",
+          height: "75%",
         },
         legend: {
           position: "none"

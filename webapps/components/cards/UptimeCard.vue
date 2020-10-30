@@ -4,7 +4,7 @@
     elevation="8"
     tile
     dark>
-    <v-card-title class="title accent py-1 ">
+    <v-card-title class="subtitle-1 accent py-0 ">
      Uptime
     </v-card-title>
     <v-card-text class="py-2 d-flex align-center" style="min-height:123px">
