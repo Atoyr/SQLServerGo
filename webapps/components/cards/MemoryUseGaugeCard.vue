@@ -2,6 +2,7 @@
   <v-card 
     color="primary"
     elevation="8"
+    tile
     dark>
     <v-card-title class="title accent py-1">
      Memory
