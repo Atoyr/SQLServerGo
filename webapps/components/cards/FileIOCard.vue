@@ -4,7 +4,7 @@
     tile
     dark>
     <v-card-title class="title accent py-1">
-      {{this.database}} File {{this.write?'write':'read'}} MiB/sec
+      {{this.database}} File {{this.write?'Write':'Read'}} KiB/sec
     </v-card-title>
     <v-card-text>
       <v-container class="px-1 py-1">
