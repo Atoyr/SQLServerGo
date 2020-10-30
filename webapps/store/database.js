@@ -35,7 +35,7 @@ export const mutations = {
     state.serverProperty.productLevel = props.serverProperty.productLevel;
   },
   updateInstance(state, props) {
-    let datetime = props.data[0].datetime;
+    let datetime = new Date(props.data[0].datetime);
     let fileCount = 0;
     let beforeDatabaseName = ""
     for(const f of props.data){

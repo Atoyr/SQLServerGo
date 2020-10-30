@@ -17,7 +17,7 @@
               />
           </v-col>         
           <v-col md=4>
-            <v-simple-table class="primary" dark>
+            <v-simple-table class="primary" dense dark>
                 <thead>
                   <tr>
                     <th class="text-left">
@@ -33,8 +33,8 @@
                     v-for="item in tableData"
                     :key="item.name"
                   >
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.io }} KiB/sec</td>
+                  <td class="pa-1">{{ item.name }}</td>
+                  <td class="pa-1">{{ item.io }} KiB/sec</td>
                   </tr>
                 </tbody>
             </v-simple-table>
@@ -103,6 +103,10 @@ export default {
         title: this.write ? 'write' : 'read',
         colors: ["#AEC7E8","#FFBB78","#98E28A","#FF9896","#C5B0D5","#C49C94"],
         hAxis: {
+          format: 'hh:mm:ss',
+          textStyle: {
+            color: '#eeeeee'
+          }
         },
         vAxis: {
           minValue: 100,
@@ -114,7 +118,8 @@ export default {
           fill: '#293349'
         },
         chartArea: {
-          backgroundColor: '#293349'
+          backgroundColor: '#293349',
+          width: "90%",
         },
         legend: {
           position: "none"
