@@ -8,13 +8,10 @@
         <CpuUseGaugeCard ></CpuUseGaugeCard>
       </v-col>
       <v-col sm=4 md=2 class="pa-1">
-        <MemoryUseGaugeCard ></MemoryUseGaugeCard>
-      </v-col>
-      <v-col sm=4 md=2 class="pa-1">
-        <MemoryUsedCard></MemoryUsedCard>
-      </v-col>
-      <v-col sm=4 md=2 class="pa-1">
         <BufferCacheRateGaugeCard ></BufferCacheRateGaugeCard>
+      </v-col>
+      <v-col sm=6 md=4 class="pa-1">
+        <MemoryUsedCard></MemoryUsedCard>
       </v-col>
     </v-row>
     <v-row>

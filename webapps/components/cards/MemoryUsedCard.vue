@@ -34,6 +34,7 @@ export default {
     chartOptions: function(){
       return {
       // title: this.write ? 'write' : 'read',
+        height : 109,
         colors: ["#FFBB78","#AEC7E8"],
         hAxis: {
           format: 'hh:mm:ss',

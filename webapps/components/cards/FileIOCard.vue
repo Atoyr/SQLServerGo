@@ -33,11 +33,11 @@
                     v-for="item in tableData"
                     :key="item.name"
                   >
-                  <td class="pa-1 text-left">
+                  <td class="pa-1 text-left body-2">
                     <v-icon :color="item.color">mdi-chart-line-variant</v-icon>
                     {{ item.name }}
                   </td>
-                  <td class="pa-1 text-right">{{ item.io }} KiB/sec</td>
+                  <td class="pa-1 text-right body-2">{{ item.io }} KiB/sec</td>
                   </tr>
                 </tbody>
             </v-simple-table>
