@@ -33,8 +33,11 @@
                     v-for="item in tableData"
                     :key="item.name"
                   >
-                  <td class="pa-1">{{ item.name }}</td>
-                  <td class="pa-1">{{ item.io }} KiB/sec</td>
+                  <td class="pa-1 text-left">
+                    <v-icon :color="item.color">mdi-chart-line-variant</v-icon>
+                    {{ item.name }}
+                  </td>
+                  <td class="pa-1 text-right">{{ item.io }} KiB/sec</td>
                   </tr>
                 </tbody>
             </v-simple-table>
@@ -76,7 +79,7 @@ export default {
         let tdata = []
         let index = this.dtil.length - 1
         for(let i = 1; i < this.header[0].length; i++) {
-          tdata.push({name: this.header[0][i],io: this.dtil[index][i]})
+          tdata.push({ name: this.header[0][i], io: this.dtil[index][i] ,color:this.chartOptions.colors[(i -1) % this.chartOptions.colors.length] })
         }
         this.tableData = tdata
       }
