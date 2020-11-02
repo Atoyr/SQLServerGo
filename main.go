@@ -155,25 +155,25 @@ func action(c *cli.Context) error {
 
   // register subscribe
   ps.Sub(func(dbFileIO []db.DatabaseFileIO) {
-    t := time.Now()
+    // t := time.Now()
     data, _ := json.Marshal(dbFileIO)
     fileIOHub.broadcast <- data
     // update(bolt, "databaseFileIO", []byte(t.Format(time.RFC3339)), []byte(data))
   })
   ps.Sub(func(cpu db.Cpu) {
-    t := time.Now()
+    // t := time.Now()
     data, _ := json.Marshal(cpu)
     cpuUsedHub.broadcast <- data
     // update(bolt, "cpuUsed", []byte(t.Format(time.RFC3339)), []byte(data))
   })
   ps.Sub(func(memory db.Memory) {
-    t := time.Now()
+    // t := time.Now()
     data, _ := json.Marshal(memory)
     memoryHub.broadcast <- data
     // update(bolt, "memory", []byte(t.Format(time.RFC3339)), []byte(data))
   })
   ps.Sub(func(bufferCache db.BufferCache) {
-    t := time.Now()
+    // t := time.Now()
     data, _ := json.Marshal(bufferCache)
     bufferCacheHub.broadcast <- data
     // update(bolt, "bufferCache", []byte(t.Format(time.RFC3339)), []byte(data))
