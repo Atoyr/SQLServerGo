@@ -38,6 +38,7 @@ export const mutations = {
     let datetime = new Date(props.data[0].datetime);
     let fileCount = 0;
     let beforeDatabaseName = ""
+    // create database struct in instance
     for(const f of props.data){
       if (beforeDatabaseName != f.database_name) {
         fileCount = 0;
@@ -53,16 +54,19 @@ export const mutations = {
       fileCount++;
     }
 
+    // add X key
     for(let key in state.instance) {
       state.instance[key].read.push([datetime]);
       state.instance[key].write.push([datetime]);
     }
+    // add value exchange KiB 
     for(const f of props.data){
       let index = state.instance[f.database_name].read.length - 1
       state.instance[f.database_name].read[index].push(f.read_bytes_per_sec / 1024)
       state.instance[f.database_name].write[index].push(f.write_bytes_per_sec / 1024)
     }
     
+    // apply data max length 
     for(let key in state.instance) {
       if (state.instance[key].read.length > 30) {
         state.instance[key].read.shift();
