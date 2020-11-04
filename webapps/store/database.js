@@ -35,35 +35,31 @@ export const mutations = {
     state.serverProperty.productLevel = props.serverProperty.productLevel;
   },
   updateInstance(state, props) {
-    let datetime = new Date(props.data[0].datetime);
-    let fileCount = 0;
-    let beforeDatabaseName = ""
+    let datetime = new Date(props.data.datetime);
     // create database struct in instance
-    for(const f of props.data){
-      if (beforeDatabaseName != f.database_name) {
-        fileCount = 0;
-        beforeDatabaseName = f.database_name;
-      }
-      if (f.database_name in state.instance){
-        if (state.instance[f.database_name].files.length <= fileCount ) {
-          state.instance[f.database_name].files.push(f.file_name)
+    props.data.databases.forEach((d) => {
+      if (d.database_name in state.instance){
+      } else{
+        state.instance[d.database_name] = {files:[],read:[],write:[]}
+        for(const f of d.files){
+          state.instance[d.database_name].files.push(f.file_name)
         }
-      }else {
-        state.instance[f.database_name] = {files:[f.file_name],read:[],write:[]}
       }
-      fileCount++;
-    }
+    });
 
     // add X key
     for(let key in state.instance) {
       state.instance[key].read.push([datetime]);
       state.instance[key].write.push([datetime]);
     }
+
     // add value exchange KiB 
-    for(const f of props.data){
-      let index = state.instance[f.database_name].read.length - 1
-      state.instance[f.database_name].read[index].push(f.read_bytes_per_sec / 1024)
-      state.instance[f.database_name].write[index].push(f.write_bytes_per_sec / 1024)
+    for(const d of props.data.databases){
+      let index = state.instance[d.database_name].read.length - 1
+      for(const f of d.files){
+        state.instance[d.database_name].read[index].push(f.read_bytes_per_sec / 1024)
+        state.instance[d.database_name].write[index].push(f.write_bytes_per_sec / 1024)
+      }
     }
     
     // apply data max length 

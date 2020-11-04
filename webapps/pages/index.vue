@@ -65,7 +65,7 @@ export default {
     var ws = new W3CWebSocket(`ws://${this.$getHost()}/ws/fileio`)
     ws.onmessage = (e) => {
       if (typeof e.data === 'string') {
-        let data = JSON.parse(event.data);
+        let data = JSON.parse(e.data);
         this.$store.commit('database/updateInstance',{data})
       }
     }

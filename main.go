@@ -156,7 +156,15 @@ func action(c *cli.Context) error {
 
   // register subscribe
   ps.Sub(func(dbFileIO []db.DatabaseFileIO) {
-    data, _ := json.Marshal(dbFileIO)
+    i := createInstanceIO(dbFileIO)
+    data, _ := json.Marshal(i)
+    f := filepath.Join(appPath, "write.json")
+    file, err := os.OpenFile(f, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    if err != nil {
+      log.Fatal(err)
+    }
+    defer file.Close()
+    fmt.Fprintln(file, string(data)) //書き込み
     fileIOHub.Broadcast(data)
   })
   ps.Sub(func(cpu db.Cpu) {
