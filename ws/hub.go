@@ -2,7 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package ws
+
+import (
+  "log"
+  "net/http"
+)
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -20,7 +25,7 @@ type Hub struct {
 	unregister chan *Client
 }
 
-func newHub() *Hub {
+func NewHub() *Hub {
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
@@ -29,7 +34,7 @@ func newHub() *Hub {
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
@@ -50,4 +55,25 @@ func (h *Hub) run() {
 			}
 		}
 	}
+}
+
+// ServeWs handles websocket requests from the peer.
+func (hub *Hub) ServeWs(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client.hub.register <- client
+
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go client.readPump()
+	go client.writePump()
+}
+
+// Broadcast is broadcasting for hub
+func (hub *Hub) Broadcast(data []byte) {
+  hub.broadcast <- data
 }

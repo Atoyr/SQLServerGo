@@ -26,6 +26,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/urfave/cli/v2"
   "github.com/mattn/go-pubsub"
+	"github.com/atoyr/SQLServerGo/ws"
 	db "github.com/atoyr/SQLServerGo/database"
 )
 
@@ -143,45 +144,35 @@ func action(c *cli.Context) error {
 	}
 	defer d.Close()
 
-  // create and run websocket hub
-	fileIOHub := newHub()
-	cpuUsedHub := newHub()
-	memoryHub := newHub()
-	bufferCacheHub := newHub()
-	go fileIOHub.run()
-	go cpuUsedHub.run()
-	go memoryHub.run()
-	go bufferCacheHub.run()
+  // create and run ws hub
+	fileIOHub := ws.NewHub()
+	cpuUsedHub := ws.NewHub()
+	memoryHub := ws.NewHub()
+	bufferCacheHub := ws.NewHub()
+	go fileIOHub.Run()
+	go cpuUsedHub.Run()
+	go memoryHub.Run()
+	go bufferCacheHub.Run()
 
   // register subscribe
   ps.Sub(func(dbFileIO []db.DatabaseFileIO) {
-    // t := time.Now()
     data, _ := json.Marshal(dbFileIO)
-    fileIOHub.broadcast <- data
-    // update(bolt, "databaseFileIO", []byte(t.Format(time.RFC3339)), []byte(data))
+    fileIOHub.Broadcast(data)
   })
   ps.Sub(func(cpu db.Cpu) {
-    // t := time.Now()
     data, _ := json.Marshal(cpu)
-    cpuUsedHub.broadcast <- data
-    // update(bolt, "cpuUsed", []byte(t.Format(time.RFC3339)), []byte(data))
+    cpuUsedHub.Broadcast(data)
   })
   ps.Sub(func(memory db.Memory) {
-    // t := time.Now()
     data, _ := json.Marshal(memory)
-    memoryHub.broadcast <- data
-    // update(bolt, "memory", []byte(t.Format(time.RFC3339)), []byte(data))
+    memoryHub.Broadcast(data)
   })
   ps.Sub(func(bufferCache db.BufferCache) {
-    // t := time.Now()
     data, _ := json.Marshal(bufferCache)
-    bufferCacheHub.broadcast <- data
-    // update(bolt, "bufferCache", []byte(t.Format(time.RFC3339)), []byte(data))
+    bufferCacheHub.Broadcast(data)
   })
 
-
 	back := context.Background()
-  //tickerCtx, _ := context.WithCancel(back)
   go func(c context.Context){
     t := time.NewTicker(time.Duration(tickRate) * time.Second)
     for {
@@ -204,21 +195,21 @@ func action(c *cli.Context) error {
 	box := packr.New("webapps", "./public")
 	ec.GET("/*", echo.WrapHandler(http.StripPrefix("/", http.FileServer(box))))
 
-	// websocket
+	// ws
 	ec.GET("/ws/fileio", func(c echo.Context) error {
-		serveWs(fileIOHub, c.Response(), c.Request())
+		fileIOHub.ServeWs(c.Response(), c.Request())
 		return nil
 	})
 	ec.GET("/ws/cpu", func(c echo.Context) error {
-		serveWs(cpuUsedHub, c.Response(), c.Request())
+		cpuUsedHub.ServeWs(c.Response(), c.Request())
 		return nil
 	})
 	ec.GET("/ws/memory", func(c echo.Context) error {
-		serveWs(memoryHub, c.Response(), c.Request())
+		memoryHub.ServeWs(c.Response(), c.Request())
 		return nil
 	})
 	ec.GET("/ws/bufferCache", func(c echo.Context) error {
-		serveWs(bufferCacheHub, c.Response(), c.Request())
+		bufferCacheHub.ServeWs(c.Response(), c.Request())
 		return nil
 	})
 
