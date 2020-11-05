@@ -14,29 +14,40 @@
         <MemoryUsedCard></MemoryUsedCard>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col md=6 class="pa-1">
-        <FileIOCard database="R_1_1_0_SC" ></FileIOCard>
-      </v-col>
-      <v-col md=6 class="pa-1">
-        <FileIOCard database="R_1_1_0_SC" write></FileIOCard>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col md=6 class="pa-1">
-        <FileIOCard database="R_1_1_0_FI" ></FileIOCard>
-      </v-col>
-      <v-col md=6 class="pa-1">
-        <FileIOCard database="R_1_1_0_FI" write></FileIOCard>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col md=6 class="pa-1">
-        <FileIOCard database="tempdb" ></FileIOCard>
-      </v-col>
-      <v-col md=6 class="pa-1">
-        <FileIOCard database="tempdb" write></FileIOCard>
-      </v-col>
+    <v-row class="pa-1">
+      <v-expansion-panels>
+        <v-expansion-panel class="background">
+          <v-expansion-panel-header>File IO</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-container fluid class="pa-0">
+              <v-row>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard database="R_1_1_0_SC" ></FileIOCard>
+                </v-col>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard database="R_1_1_0_SC" write></FileIOCard>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard database="R_1_1_0_FI" ></FileIOCard>
+                </v-col>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard database="R_1_1_0_FI" write></FileIOCard>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard database="tempdb" ></FileIOCard>
+                </v-col>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard database="tempdb" write></FileIOCard>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-row>
   </v-container>
 </template>
