@@ -20,7 +20,9 @@ export const state = () => ({
   },
   serverStatus: {
     startTime: new Date()
-  }
+  },
+  databases: [],
+  databaseFilter: []
 })
 
 export const mutations = {
@@ -84,6 +86,12 @@ export const mutations = {
   },
   updateServerStatus(state, props) {
     state.serverStatus.startTime = new Date(props.serverStatus.instance_start_time);
+  },
+  updateDatabases(state, props) {
+    state.databases = props.databases
+  },
+  updateDatabaseFilter(state, props) {
+    state.databaseFilter = props.databaseFilter
   }
 }
 
@@ -99,6 +107,12 @@ export const getters = {
   },
   StartTime (state) {
     return state.serverStatus.startTime;
+  },
+  Databases (state) {
+    return state.databases;
+  },
+  DatabaseFilter (state) {
+    return state.databaseFilter;
   }
 }
 
@@ -121,6 +135,16 @@ export const actions = {
     .then((res) => {
       commit('updateServerStatus',{serverStatus:res.data})
       console.log(res.data)
+    })
+  },
+  async fetchDatabases({commit}) {
+    await axios.get(`http://${this.$getHost()}/api/databases`)
+    .then((res) => {
+      let dbs = []
+      for(const d of res.data){
+        dbs.push(d.name)
+      }
+      commit('updateDatabases',{databases: dbs})
     })
   }
 }

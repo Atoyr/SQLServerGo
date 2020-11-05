@@ -24,7 +24,7 @@ const DatabasesQuery string = `
   FROM sys.databases
 `
 
-func NewDatabases(dbcontext *sql.DB) ([]Database, error) {
+func GetDatabases(dbcontext *sql.DB) ([]Database, error) {
 	ctx := context.Background()
 	ds := make([]Database, 0, 10)
 	rows, err := dbcontext.QueryContext(ctx, DatabasesQuery)

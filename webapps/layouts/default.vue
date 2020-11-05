@@ -1,7 +1,20 @@
 <template>
   <v-app dark :style="{background: $vuetify.theme.themes['dark'].background}">
-    <h1 class="left-label">{{ServerName}}</h1>
+    <v-app-bar class="accent" flat>
+      <v-app-bar-title>{{ServerName}}</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <v-select
+        label="filter"
+        v-model="databaseFilter"
+        :items="Databases"
+        multiple
+        chips
+        class="align-center"
+        ></v-select>
+    </v-app-bar>
+    <v-content>
       <nuxt />
+    </v-content>
   </v-app>
 </template>
 
@@ -16,8 +29,12 @@ export default {
     }
   },
   computed: {
-      ...mapGetters('database',["ServerName"])
+    ...mapGetters('database',["ServerName","Databases"]),
+    databaseFilter: {
+      get () { return this.$store.getters["database/DatabaseFilter"]; },
+      set (val) { this.$store.commit('database/updateDatabaseFilter', {databaseFilter: val}) },
     },
+  },
 }
 </script>
 

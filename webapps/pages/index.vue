@@ -15,39 +15,16 @@
       </v-col>
     </v-row>
     <v-row class="pa-1">
-      <v-expansion-panels>
-        <v-expansion-panel class="background">
-          <v-expansion-panel-header>File IO</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-container fluid class="pa-0">
-              <v-row>
-                <v-col md=6 class="pa-1">
-                  <FileIOCard database="R_1_1_0_SC" ></FileIOCard>
-                </v-col>
-                <v-col md=6 class="pa-1">
-                  <FileIOCard database="R_1_1_0_SC" write></FileIOCard>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md=6 class="pa-1">
-                  <FileIOCard database="R_1_1_0_FI" ></FileIOCard>
-                </v-col>
-                <v-col md=6 class="pa-1">
-                  <FileIOCard database="R_1_1_0_FI" write></FileIOCard>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md=6 class="pa-1">
-                  <FileIOCard database="tempdb" ></FileIOCard>
-                </v-col>
-                <v-col md=6 class="pa-1">
-                  <FileIOCard database="tempdb" write></FileIOCard>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
+      <v-container fluid class="pa-0">
+        <v-row v-for="db in DatabaseFilter" >
+          <v-col md=6 class="pa-1">
+            <FileIOCard :database="db" ></FileIOCard>
+          </v-col>
+          <v-col md=6 class="pa-1">
+            <FileIOCard :database="db" write></FileIOCard>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-row>
   </v-container>
 </template>
@@ -66,7 +43,6 @@ import Gauge from '@/components/Gauge.vue'
 import { mapGetters} from 'vuex'
 import { w3cwebsocket } from 'websocket';
 const W3CWebSocket = w3cwebsocket
-const datalength = 300
 
 export default {
   components: {
@@ -90,13 +66,14 @@ export default {
     }
   }, 
   computed: {
-      ...mapGetters('database',["ServerName"])
+      ...mapGetters('database',["ServerName","DatabaseFilter"])
     },
    async fetch ({ store, params }) {
      console.log("fetch")
      await store.dispatch('database/fetchServerProperty');
      await store.dispatch('database/fetchDatabaseFiles');
      await store.dispatch('database/fetchServerStatus');
+     await store.dispatch('database/fetchDatabases');
    },
   head() {
     return {

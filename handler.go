@@ -23,6 +23,20 @@ func handleDatabaseFiles(c echo.Context) error {
 	return c.JSON(http.StatusOK, dbFiles)
 }
 
+func handleDatabases(c echo.Context) error {
+	con := db.NewConn(database, instance, sqlserver, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		return err
+	}
+	dbs, err := db.GetDatabases(d)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return c.JSON(http.StatusOK, dbs)
+}
+
 func handleInstance(c echo.Context) error {
 	con := db.NewConn(database, instance, sqlserver, user, password)
 	d, err := sql.Open("sqlserver", con.Connectionstring())
