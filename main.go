@@ -37,6 +37,8 @@ var user string
 var password string
 var database string
 
+var websocketCount int64
+
 // Web
 var webport int
 var tickRate int64
@@ -108,6 +110,12 @@ func main() {
 			Usage:       "performance data tick rate",
 			Destination: &tickRate,
 		},
+		&cli.Int64Flag{
+			Name:        "count",
+			Value:       30,
+			Usage:       "websocket average count",
+			Destination: &websocketCount,
+		},
 	}
 
 	app.Action = action
@@ -158,14 +166,16 @@ func action(c *cli.Context) error {
   ps.Sub(func(dbFileIO []db.DatabaseFileIO) {
     i := createInstanceIO(dbFileIO)
     data, _ := json.Marshal(i)
+    fileIOHub.Broadcast(data)
+
+    temp, _ := json.Marshal(i.Databases[6])
     f := filepath.Join(appPath, "write.json")
     file, err := os.OpenFile(f, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
     if err != nil {
       log.Fatal(err)
     }
     defer file.Close()
-    fmt.Fprintln(file, string(data)) //書き込み
-    fileIOHub.Broadcast(data)
+    fmt.Fprintln(file, string(temp)) //書き込み
   })
   ps.Sub(func(cpu db.Cpu) {
     data, _ := json.Marshal(cpu)

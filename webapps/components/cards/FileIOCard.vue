@@ -9,22 +9,28 @@
     <v-card-text>
       <v-container class="px-1 py-1">
         <v-row>
-          <v-col md=8>
+          <v-col md=6>
             <GChart
               type="AreaChart"
               :data="chartData"
               :options="chartOptions"
               />
           </v-col>         
-          <v-col md=4>
-            <v-simple-table class="primary" dense dark>
+          <v-col md=6>
+            <v-simple-table class="primary" dense dark height=150>
                 <thead>
                   <tr>
                     <th class="text-left">
                       fileName
                     </th>
                     <th class="text-left">
-                      KiB/sec
+                      min
+                    </th>
+                    <th class="text-left">
+                      avg
+                    </th>
+                    <th class="text-left">
+                      max
                     </th>
                   </tr>
                 </thead>
@@ -37,7 +43,9 @@
                     <v-icon :color="item.color">mdi-chart-line-variant</v-icon>
                     {{ item.name }}
                   </td>
-                  <td class="pa-1 text-right body-2">{{ item.io }} KiB/sec</td>
+                  <td class="pa-1 text-right body-2">{{ item.min | round }}KiB/s</td>
+                  <td class="pa-1 text-right body-2">{{ item.avg | round }}KiB/s</td>
+                  <td class="pa-1 text-right body-2">{{ item.max | round }}KiB/s</td>
                   </tr>
                 </tbody>
             </v-simple-table>
@@ -55,6 +63,11 @@ import { mapGetters } from 'vuex';
 export default {
   components: {
     GChart
+  },
+  filters:{
+    round(value){ 
+      return Math.round(value * 100) / 100;
+    },
   },
   methods: {
   },
@@ -78,8 +91,15 @@ export default {
 
         let tdata = []
         let index = this.dtil.length - 1
-        for(let i = 1; i < this.header[0].length; i++) {
-          tdata.push({ name: this.header[0][i], io: this.dtil[index][i] ,color:this.chartOptions.colors[(i -1) % this.chartOptions.colors.length] })
+        let summary = state.database.instance[this.database].summary
+        for(let i = 0; i < summary.length; i++) {
+
+          tdata.push({
+            name: summary[i].fileName,
+            min: this.write ? summary[i].MinWrite : summary[i].MinRead,
+            avg: this.write ? summary[i].AvgWrite : summary[i].AvgRead,
+            max: this.write ? summary[i].MaxWrite : summary[i].MaxRead,
+            color:this.chartOptions.colors[i % this.chartOptions.colors.length] })
         }
         this.tableData = tdata
       }
@@ -103,7 +123,7 @@ export default {
       dtil : [],
       tableData : [],
       chartOptions: {
-        // title: this.write ? 'write' : 'read',
+        height: 150,
         colors: ["#FFBB78","#AEC7E8","#98E28A","#FF9896","#C5B0D5","#C49C94"],
         hAxis: {
           format: 'hh:mm:ss',
@@ -123,7 +143,9 @@ export default {
         chartArea: {
           backgroundColor: '#293349',
           width: "90%",
-          height: "75%",
+          top:8,
+          left:32,
+          bottom: 32,
         },
         legend: {
           position: "none"

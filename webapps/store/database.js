@@ -40,25 +40,35 @@ export const mutations = {
     props.data.databases.forEach((d) => {
       if (d.database_name in state.instance){
       } else{
-        state.instance[d.database_name] = {files:[],read:[],write:[]}
+        state.instance[d.database_name] = {files:[], read:[], write:[], summary:[]}
         for(const f of d.files){
           state.instance[d.database_name].files.push(f.file_name)
         }
       }
     });
 
-    // add X key
-    for(let key in state.instance) {
-      state.instance[key].read.push([datetime]);
-      state.instance[key].write.push([datetime]);
-    }
 
     // add value exchange KiB 
     for(const d of props.data.databases){
-      let index = state.instance[d.database_name].read.length - 1
+      // init summary
+      state.instance[d.database_name].summary = [];
+      // add X key
+      state.instance[d.database_name].read.push([datetime]);
+      state.instance[d.database_name].write.push([datetime]);
+
+      let index = state.instance[d.database_name].read.length - 1;
       for(const f of d.files){
-        state.instance[d.database_name].read[index].push(f.read_bytes_per_sec / 1024)
-        state.instance[d.database_name].write[index].push(f.write_bytes_per_sec / 1024)
+        state.instance[d.database_name].read[index].push(f.read_bytes_per_sec / 1024);
+        state.instance[d.database_name].write[index].push(f.write_bytes_per_sec / 1024);
+        state.instance[d.database_name].summary.push({
+          fileName: f.file_name,
+          MinRead: f.min_read_bytes_per_sec / 1024,
+          AvgRead: f.avg_read_bytes_per_sec / 1024,
+          MaxRead: f.max_read_bytes_per_sec / 1024,
+          MinWrite: f.min_write_bytes_per_sec / 1024,
+          AvgWrite: f.avg_write_bytes_per_sec / 1024,
+          MaxWrite: f.max_write_bytes_per_sec / 1024
+        });
       }
     }
     
