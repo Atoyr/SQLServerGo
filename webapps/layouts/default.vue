@@ -1,7 +1,7 @@
 <template>
   <v-app dark :style="{background: $vuetify.theme.themes['dark'].background}">
     <v-app-bar class="accent" flat>
-      <v-app-bar-title>{{ServerName}}</v-app-bar-title>
+      <v-toolbar-title>{{ServerName}}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-select
         label="filter"
