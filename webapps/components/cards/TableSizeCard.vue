@@ -60,7 +60,7 @@ export default {
         { text: 'reservedBytes', value: 'reserved_bytes' },
         { text: 'dataBytes', value: 'data_bytes' },
         { text: 'indexBytes', value: 'index_bytes' },
-        { text: 'UnuserdBytes', value: 'unserd_bytes' },
+        { text: 'unusedBytes', value: 'unusedByte' },
       ],
       unsubscribe: {},
       tableSizes:[]

@@ -12,7 +12,7 @@ type TableSize struct {
   ReservedBytes int64 `json:"reserved_bytes"`
   DataBytes int64 `json:"data_bytes"`
   IndexBytes int64 `json:"index_bytes"`
-  UnusedBytes int64 `json:"unserd_bytes"`
+  UnusedBytes int64 `json:"unused_bytes"`
 }
 
 
