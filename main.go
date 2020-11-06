@@ -236,6 +236,7 @@ func action(c *cli.Context) error {
 	ec.GET("/api/serverStatus", handleServerStatus)
 	ec.GET("/api/databaseFiles", handleDatabaseFiles)
 	ec.GET("/api/databases", handleDatabases)
+  ec.GET("/api/tableSize/:database", handleTableSize)
 	ec.GET("/api/cpuUsed", handleCpuUsed)
 	ec.GET("/api/memory", handleMemory)
 	ec.GET("/api/bufferCache", handleBufferCache)

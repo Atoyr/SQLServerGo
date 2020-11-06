@@ -15,16 +15,39 @@
       </v-col>
     </v-row>
     <v-row class="pa-1">
-      <v-container fluid class="pa-0">
-        <v-row v-for="db in DatabaseFilter" >
-          <v-col md=6 class="pa-1">
-            <FileIOCard :database="db" ></FileIOCard>
-          </v-col>
-          <v-col md=6 class="pa-1">
-            <FileIOCard :database="db" write></FileIOCard>
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-expansion-panels>
+        <v-expansion-panel class="background">
+          <v-expansion-panel-header>File IO</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-container fluid class="pa-0">
+              <v-row v-for="db in DatabaseFilter" >
+                <v-col md=6 class="pa-1">
+                  <FileIOCard :database="db" ></FileIOCard>
+                </v-col>
+                <v-col md=6 class="pa-1">
+                  <FileIOCard :database="db" write></FileIOCard>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-row>
+    <v-row class="pa-1">
+      <v-expansion-panels>
+        <v-expansion-panel class="background">
+          <v-expansion-panel-header>Table Size</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-container fluid class="pa-0">
+              <v-row v-for="db in DatabaseFilter" >
+                <v-col md=12 class="pa-1">
+                  <TableSizeCard :database="db"></TableSizeCard>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-row>
   </v-container>
 </template>
@@ -39,6 +62,7 @@ import FileReadIOCard from '@/components/cards/FileReadIOCard.vue'
 import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
 import testChart from '@/components/cards/testChart.vue'
 import FileIOCard from '@/components/cards/FileIOCard.vue'
+import TableSizeCard from '@/components/cards/TableSizeCard.vue'
 import Gauge from '@/components/Gauge.vue'
 import { mapGetters} from 'vuex'
 import { w3cwebsocket } from 'websocket';
@@ -54,6 +78,7 @@ export default {
     FileReadIOCard,
     FileWriteIOCard,
     FileIOCard,
+    TableSizeCard,
     testChart
   },
   mounted() {

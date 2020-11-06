@@ -22,7 +22,8 @@ export const state = () => ({
     startTime: new Date()
   },
   databases: [],
-  databaseFilter: []
+  databaseFilter: [],
+  tableSizes: {}
 })
 
 export const mutations = {
@@ -92,6 +93,9 @@ export const mutations = {
   },
   updateDatabaseFilter(state, props) {
     state.databaseFilter = props.databaseFilter
+  },
+  updateTableSize(state, props) {
+    state.tableSizes[props.database] = props.tableSize
   }
 }
 
@@ -113,6 +117,14 @@ export const getters = {
   },
   DatabaseFilter (state) {
     return state.databaseFilter;
+  },
+  TableSize (state){ return ({ database }) => {
+      if (database in state.tableSizes){
+        return state.tableSizes[database];
+      }else {
+        return []
+      }
+    }
   }
 }
 
@@ -145,6 +157,12 @@ export const actions = {
         dbs.push(d.name)
       }
       commit('updateDatabases',{databases: dbs})
+    })
+  },
+  async fetchTableSize({commit},{database}) {
+    await axios.get(`http://${this.$getHost()}/api/tableSize/${database}`)
+    .then((res) => {
+      commit('updateTableSize',{database: database, tableSize: res.data})
     })
   }
 }

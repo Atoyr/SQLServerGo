@@ -1,6 +1,7 @@
 package main
 
 import (
+  "strings"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -30,6 +31,31 @@ func handleDatabases(c echo.Context) error {
 		return err
 	}
 	dbs, err := db.GetDatabases(d)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return c.JSON(http.StatusOK, dbs)
+}
+
+func handleTableSize(c echo.Context) error {
+  database := c.Param("database")
+  if database == "" {
+    database = "master"
+  }
+  if strings.Contains(database,";") {
+    database = "master"
+  }
+  if len(strings.Fields(database)) != 1 {
+    database = "master"
+  }
+
+	con := db.NewConn(database, instance, sqlserver, user, password)
+	d, err := sql.Open("sqlserver", con.Connectionstring())
+	if err != nil {
+		return err
+	}
+	dbs, err := db.GetTableSize(d, database)
 	if err != nil {
 		fmt.Println(err)
 		return err
