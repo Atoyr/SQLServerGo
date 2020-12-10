@@ -40,8 +40,11 @@
           <v-expansion-panel-content>
             <v-container fluid class="pa-0">
               <v-row v-for="db in DatabaseFilter" >
-                <v-col md=12 class="pa-1">
+                <v-col md=8 class="pa-1">
                   <TableSizeCard :database="db"></TableSizeCard>
+                </v-col>
+                <v-col md=4 class="pa-1">
+                  <TableSizeBarChart :database="db"></TableSizeBarChart>
                 </v-col>
               </v-row>
             </v-container>
@@ -63,6 +66,7 @@ import FileWriteIOCard from '@/components/cards/FileWriteIOCard.vue'
 import testChart from '@/components/cards/testChart.vue'
 import FileIOCard from '@/components/cards/FileIOCard.vue'
 import TableSizeCard from '@/components/cards/TableSizeCard.vue'
+import TableSizeBarChart from '@/components/cards/TableSizeBarChart.vue'
 import Gauge from '@/components/Gauge.vue'
 import { mapGetters} from 'vuex'
 import { w3cwebsocket } from 'websocket';
@@ -79,6 +83,7 @@ export default {
     FileWriteIOCard,
     FileIOCard,
     TableSizeCard,
+    TableSizeBarChart,
     testChart
   },
   mounted() {

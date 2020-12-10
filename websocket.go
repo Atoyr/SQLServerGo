@@ -35,7 +35,23 @@ type FileIO struct {
   AvgWriteBytesPerSec float64   `json:"avg_write_bytes_per_sec"`
 }
 
+type Memory struct {
+  Datetime          time.Time `json:"datetime"`
+	PhysicalMemory    int       `json:"physical_memory"`
+	UsedMemory        int       `json:"used_memory"`
+  MinUsedMemory     int       `json:"min_used_memory"`
+  MaxUsedMemory     int       `json:"max_used_memory"`
+  AvgUsedMemory     int       `json:"avg_used_memory"`
+	AvailableMemory   int       `json:"available_memory"`
+	TotalPageFile     int       `json:"total_page_file"`
+	UsedPageFile      int       `json:"used_page_file"`
+	AvailablePageFile int       `json:"available_page_file"`
+	SystemChace       int       `json:"system_chace"`
+	SystemMemoryState string    `json:"system_memory_state"`
+}
+
 var dbFileIOs [][]db.DatabaseFileIO
+var memorys []db.Memory
 
 func createInstanceIO(dbFileIO []db.DatabaseFileIO) InstanceIO {
   if dbFileIOs == nil {

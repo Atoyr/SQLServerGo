@@ -167,15 +167,6 @@ func action(c *cli.Context) error {
     i := createInstanceIO(dbFileIO)
     data, _ := json.Marshal(i)
     fileIOHub.Broadcast(data)
-
-    temp, _ := json.Marshal(i.Databases[6])
-    f := filepath.Join(appPath, "write.json")
-    file, err := os.OpenFile(f, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-    if err != nil {
-      log.Fatal(err)
-    }
-    defer file.Close()
-    fmt.Fprintln(file, string(temp)) //書き込み
   })
   ps.Sub(func(cpu db.Cpu) {
     data, _ := json.Marshal(cpu)
